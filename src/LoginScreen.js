@@ -5,23 +5,24 @@ import { useState } from "react";
 function LoginScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState([]);
+  const [IDCount, setIDCount] = useState(100);
+
 
   const sendLoginData = () => {
     props.updateLoginData({ username: username, password: password });
 
     console.log("hellooo")
     const dataToSend = {
-      "TableName": "BookClubData",
-      "Item": {
-        "ItemID": {
-          "N": "1"
-        },
-        "ItemType": {
-          "S": "testingUser"
-        }
-      }
+        "itemID": IDCount,
+        "itemType": "User",
+        "username": username,
+        "password": password,
+        "operation": "Query"
     }
+
+    console.log(dataToSend);
+    console.log(JSON.stringify(dataToSend))
 
     const requestOptions = {
       method: "POST",
@@ -36,12 +37,13 @@ function LoginScreen(props) {
       requestOptions
     )
       .then((response) => response.json())
-      .then((data) => setResponse(data))
+      .then((data) => setResponse(data.body))
       .catch((error) => console.error("Error making POST request:", error));
 
-    console.log(response);
-    console.log("done")
+      console.log(response)
+      setIDCount(IDCount + 1);
 
+      
   };
 
   return (
@@ -70,7 +72,16 @@ function LoginScreen(props) {
       {/* <Link to="/home" onClick={sendLoginData}>
         Enter
       </Link> */}
-      <button onClick={sendLoginData}></button>
+      <button onClick={sendLoginData}>Enter</button>
+
+      <ul>
+        {response.map((user) => (
+          <li key={user.ItemID}>
+            Username: {user.Username}, Password: {user.Password}
+          </li>
+        ))}
+      </ul>
+
     </div>
   );
 }
