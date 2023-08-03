@@ -11,7 +11,7 @@ function CreateAccountScreen(props) {
   //const [response, setResponse] = useState([]);
   const [IDCount, setIDCount] = useState(6);
   const [usernameTaken, setUsernameTaken] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
+  const [dataError, setDataError] = useState(false);
   const [createAccountSuccess, setCreateAccountSuccess] = useState(false);
 
 
@@ -61,9 +61,13 @@ function CreateAccountScreen(props) {
 
   const validateData = () => {
     setUsernameTaken(false);
-    setPasswordError(false);
+    setDataError(false);
 
-
+    if (username.length < 5 || password.length < 5){
+      setDataError(true);
+      setUsername("");
+      setPassword("");
+    } else {
     //before sending data it should check the db and see if there are any usernames that match
     const dataToSend = {
         "itemType": "User",
@@ -92,14 +96,7 @@ function CreateAccountScreen(props) {
 
         if (data.body.length === 0){
           console.log("nothing found, user can use this data")
-          if (password.length >= 5){
-            sendCreateData();
-          }
-          else {
-            setPasswordError(true);
-            setUsername("");
-            setPassword("");
-          }
+          sendCreateData();
         } else {
           console.log("taken = true")
           setUsernameTaken(true);
@@ -108,6 +105,8 @@ function CreateAccountScreen(props) {
         }
       })
       .catch((error) => console.error("Error making POST request:", error));
+
+    }
 
   };
 
@@ -136,7 +135,7 @@ function CreateAccountScreen(props) {
 
       <button onClick={validateData}>Create Account</button>
       {usernameTaken ? <p>Username is taken, please enter a new username.</p> : null}
-      {passwordError ? <p>Password must be longer than 5 characters.</p> : null}
+      {dataError ? <p>Username and Password must be longer than 4 characters.</p> : null}
       {createAccountSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
 
       {/* <ul>
