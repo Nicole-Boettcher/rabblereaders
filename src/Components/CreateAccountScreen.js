@@ -1,0 +1,155 @@
+import React from "react";
+import { Link } from 'react-router-dom';
+import { useState } from "react";
+
+function CreateAccountScreen(props) {
+
+  //const history = useHistory();
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [response, setResponse] = useState([]);
+  const [IDCount, setIDCount] = useState(3);
+  const [usernameTaken, setUsernameTaken] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+
+
+  const sendCreateData = () => {
+    props.updateLoginData({ username: username, password: password });
+
+    //before sending data it should check the db and see if there are any usernames that match
+
+    const dataToSend = {
+        "itemID": IDCount,
+        "itemType": "User",
+        "username": username,
+        "password": password,
+        "operation": "PutItem"
+    }
+
+    console.log(dataToSend);
+    console.log(JSON.stringify(dataToSend))
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataToSend),
+    };
+
+    fetch(
+      "https://1s6o72uevg.execute-api.ca-central-1.amazonaws.com/Dev/bookclub",
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((data) => setResponse(data.body))
+      .catch((error) => console.error("Error making POST request:", error));
+
+      console.log(response)
+      setIDCount(IDCount + 1);
+      setUsername("");
+      setPassword("");
+
+      
+  };
+
+  const validateData = () => {
+    setUsernameTaken(false);
+    setPasswordError(false);
+
+
+    //before sending data it should check the db and see if there are any usernames that match
+    const dataToSend = {
+        "itemID": "",
+        "itemType": "User",
+        "username": username,
+        "password": password,
+        "operation": "Query"
+    }
+
+    console.log(dataToSend);
+    console.log(JSON.stringify(dataToSend))
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataToSend),
+    };
+
+    fetch(
+      "https://1s6o72uevg.execute-api.ca-central-1.amazonaws.com/Dev/bookclub",
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setResponse(data.body)
+        console.log(data.body)
+
+        if (data.body.length == 0){
+          console.log("nothing found, user can use this data")
+          if (password.length >= 5){
+            sendCreateData();
+          }
+          else {
+            setPasswordError(true);
+            setUsername("");
+            setPassword("");
+          }
+        } else {
+          console.log("taken = true")
+          setUsernameTaken(true);
+          setUsername("");
+          setPassword("");
+        }
+      })
+      .catch((error) => console.error("Error making POST request:", error));
+
+      <Link to="/home">
+        Account Created! Continue
+      </Link>
+
+  };
+
+  return (
+    <div className="container">
+      
+      <h2>Create New Account:</h2>
+      <div className="row">
+        <label htmlFor="name-field">Username: </label>
+        <input
+          id="name-field"
+          type="text"
+          className="form-control"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <label htmlFor="password-field">Password: </label>
+        <input
+          id="password-field"
+          type="text"
+          className="form-control"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      <button onClick={validateData}>Create Account</button>
+      {usernameTaken ? <p>Username is taken, please enter a new username.</p> : null}
+      {passwordError ? <p>Password must be longer than 5 characters.</p> : null}
+
+      {/* <ul>
+        {response.map((user) => (
+          <li key={user.ItemID}>
+            Username: {user.Username}, Password: {user.Password}
+          </li>
+        ))}
+      </ul> */}
+
+    </div>
+  );
+}
+
+export default CreateAccountScreen;

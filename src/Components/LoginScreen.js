@@ -8,11 +8,9 @@ function LoginScreen(props) {
   const [response, setResponse] = useState([]);
   const [IDCount, setIDCount] = useState(100);
 
-
   const sendLoginData = () => {
     props.updateLoginData({ username: username, password: password });
 
-    console.log("hellooo")
     const dataToSend = {
         "itemID": IDCount,
         "itemType": "User",
@@ -48,8 +46,8 @@ function LoginScreen(props) {
 
   return (
     <div className="container">
-      <p>Login Screen</p>
-
+      
+      <h2>Login:</h2>
       <div className="row">
         <label htmlFor="name-field">Username: </label>
         <input
