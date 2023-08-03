@@ -5,7 +5,7 @@ import { useState } from "react";
 function LoginScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [response, setResponse] = useState([]);
+  //const [response, setResponse] = useState([]);
   const [IDCount, setIDCount] = useState(100);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginError, setLoginError] = useState(false);
@@ -37,10 +37,10 @@ function LoginScreen(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        setResponse(data);
+        //setResponse(data);
         console.log(data.body);
         console.log(JSON.stringify(data.body))
-        if (data.body.length == 1 && data.body[0].Password == password){
+        if (data.body.length === 1 && data.body[0].Password === password){
           //login data is detected and user should be logged in
           setLoginSuccess(true);
         } else {

@@ -8,7 +8,7 @@ function CreateAccountScreen(props) {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [response, setResponse] = useState([]);
+  //const [response, setResponse] = useState([]);
   const [IDCount, setIDCount] = useState(6);
   const [usernameTaken, setUsernameTaken] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
@@ -44,8 +44,8 @@ function CreateAccountScreen(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        setResponse(data.body)
-        if (data.statusCode == 200){
+        //setResponse(data.body)
+        if (data.statusCode === 200){
           props.updateLoginData({ username: username, password: password });
           setIDCount(IDCount + 1);
           setCreateAccountSuccess(true);
@@ -87,10 +87,10 @@ function CreateAccountScreen(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        setResponse(data.body)
+        //setResponse(data.body)
         console.log(data.body)
 
-        if (data.body.length == 0){
+        if (data.body.length === 0){
           console.log("nothing found, user can use this data")
           if (password.length >= 5){
             sendCreateData();
