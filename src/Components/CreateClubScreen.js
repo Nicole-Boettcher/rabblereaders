@@ -11,7 +11,7 @@ function CreateClubScreen(props) {
 
   return (
     <div className="container">
-      <p>Create a New Club:</p>
+      <h2>Create a New Club:</h2>
 
       <div className="row">
         <label htmlFor="name-field">Club Name: </label>

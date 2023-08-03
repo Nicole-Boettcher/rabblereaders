@@ -1,5 +1,5 @@
 import React from "react";
-//import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
 function LoginScreen(props) {
@@ -7,19 +7,20 @@ function LoginScreen(props) {
   const [password, setPassword] = useState("");
   const [response, setResponse] = useState([]);
   const [IDCount, setIDCount] = useState(100);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+
 
   const sendLoginData = () => {
-    props.updateLoginData({ username: username, password: password });
 
+    setLoginError(false);
+    setLoginSuccess(false);
     const dataToSend = {
-        "itemID": IDCount,
         "itemType": "User",
         "username": username,
-        "password": password,
         "operation": "Query"
     }
 
-    console.log(dataToSend);
     console.log(JSON.stringify(dataToSend))
 
     const requestOptions = {
@@ -35,13 +36,23 @@ function LoginScreen(props) {
       requestOptions
     )
       .then((response) => response.json())
-      .then((data) => setResponse(data.body))
+      .then((data) => {
+        setResponse(data);
+        console.log(data.body);
+        console.log(JSON.stringify(data.body))
+        if (data.body.length == 1 && data.body[0].Password == password){
+          //login data is detected and user should be logged in
+          setLoginSuccess(true);
+        } else {
+          setLoginError(true);
+        }
+      })
       .catch((error) => console.error("Error making POST request:", error));
 
-      console.log(response)
+  
       setIDCount(IDCount + 1);
+      props.updateLoginData({ username: username, password: password });
 
-      
   };
 
   return (
@@ -70,15 +81,16 @@ function LoginScreen(props) {
       {/* <Link to="/home" onClick={sendLoginData}>
         Enter
       </Link> */}
-      <button onClick={sendLoginData}>Enter</button>
-
-      <ul>
+      <button onClick={sendLoginData}>Login</button>
+      {loginSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
+      {loginError ? <p>Error: Username or password incorrect, please try again</p> : null}
+      {/* <ul>
         {response.map((user) => (
           <li key={user.ItemID}>
             Username: {user.Username}, Password: {user.Password}
           </li>
         ))}
-      </ul>
+      </ul> */}
 
     </div>
   );

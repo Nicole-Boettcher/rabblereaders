@@ -9,13 +9,13 @@ function CreateAccountScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [response, setResponse] = useState([]);
-  const [IDCount, setIDCount] = useState(3);
+  const [IDCount, setIDCount] = useState(6);
   const [usernameTaken, setUsernameTaken] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [createAccountSuccess, setCreateAccountSuccess] = useState(false);
 
 
   const sendCreateData = () => {
-    props.updateLoginData({ username: username, password: password });
 
     //before sending data it should check the db and see if there are any usernames that match
 
@@ -43,15 +43,20 @@ function CreateAccountScreen(props) {
       requestOptions
     )
       .then((response) => response.json())
-      .then((data) => setResponse(data.body))
+      .then((data) => {
+        setResponse(data.body)
+        if (data.statusCode == 200){
+          props.updateLoginData({ username: username, password: password });
+          setIDCount(IDCount + 1);
+          setCreateAccountSuccess(true);
+        } else {
+          console.error("ERROR");
+          setUsername("");
+          setPassword("");
+        }
+      })
       .catch((error) => console.error("Error making POST request:", error));
 
-      console.log(response)
-      setIDCount(IDCount + 1);
-      setUsername("");
-      setPassword("");
-
-      
   };
 
   const validateData = () => {
@@ -61,14 +66,11 @@ function CreateAccountScreen(props) {
 
     //before sending data it should check the db and see if there are any usernames that match
     const dataToSend = {
-        "itemID": "",
         "itemType": "User",
         "username": username,
-        "password": password,
         "operation": "Query"
     }
 
-    console.log(dataToSend);
     console.log(JSON.stringify(dataToSend))
 
     const requestOptions = {
@@ -107,10 +109,6 @@ function CreateAccountScreen(props) {
       })
       .catch((error) => console.error("Error making POST request:", error));
 
-      <Link to="/home">
-        Account Created! Continue
-      </Link>
-
   };
 
   return (
@@ -139,6 +137,7 @@ function CreateAccountScreen(props) {
       <button onClick={validateData}>Create Account</button>
       {usernameTaken ? <p>Username is taken, please enter a new username.</p> : null}
       {passwordError ? <p>Password must be longer than 5 characters.</p> : null}
+      {createAccountSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
 
       {/* <ul>
         {response.map((user) => (

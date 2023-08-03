@@ -4,6 +4,7 @@ import LoginScreen from "./Components/LoginScreen";
 import HomeScreen from "./Components/HomeScreen";
 import CreateClubScreen from "./Components/CreateClubScreen";
 import CreateAccountScreen from "./Components/CreateAccountScreen";
+import WelcomeScreen from "./Components/WelcomeScreen";
 
 function App() {
   //holds {username, password}, needs to be verified once server is running
@@ -27,12 +28,17 @@ function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        <h1>Welcome to Rabble Readers</h1>
+        <h1 style={{ textAlign: 'center' }}>Welcome to Rabble Readers</h1>
 
         <Routes>
           <Route
             exact
             path="/"
+            element={<WelcomeScreen/>}
+          />
+          <Route
+            exact
+            path="/createAccount"
             element={<CreateAccountScreen updateLoginData={updateLoginData}/>}
           />
           <Route
