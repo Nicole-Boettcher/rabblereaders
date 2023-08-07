@@ -1,9 +1,9 @@
 import React from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { useState } from "react";
+import APIcalls from "../Utils/APIcalls";
 
 function CreateAccountScreen(props) {
-
   //const history = useHistory();
 
   const [username, setUsername] = useState("");
@@ -14,39 +14,23 @@ function CreateAccountScreen(props) {
   const [dataError, setDataError] = useState(false);
   const [createAccountSuccess, setCreateAccountSuccess] = useState(false);
 
-
-  const sendCreateData = () => {
-
+  const sendCreateData = async () => {
     //before sending data it should check the db and see if there are any usernames that match
 
-    const dataToSend = {
-        "itemID": IDCount,
-        "itemType": "User",
-        "username": username,
-        "password": password,
-        "operation": "PutItem"
-    }
+    const APIService = new APIcalls({
+      "itemID": IDCount,
+      "itemType": "User",
+      "username": username,
+      "password": password,
+      "operation": "PutItem"
+    })
+    const fetchResponse = await APIService.callQuery();
+    console.log("End of fetchDataFromAPI:");
+    console.log(fetchResponse);
 
-    console.log(dataToSend);
-    console.log(JSON.stringify(dataToSend))
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataToSend),
-    };
-
-    fetch(
-      "https://1s6o72uevg.execute-api.ca-central-1.amazonaws.com/Dev/bookclub",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((data) => {
         //setResponse(data.body)
-        if (data.statusCode === 200){
-          props.updateLoginData({ username: username, password: password });
+        if (fetchResponse.statusCode === 200) {
+          props.updateUserData(fetchResponse.body[0]);
           setIDCount(IDCount + 1);
           setCreateAccountSuccess(true);
         } else {
@@ -54,65 +38,44 @@ function CreateAccountScreen(props) {
           setUsername("");
           setPassword("");
         }
-      })
-      .catch((error) => console.error("Error making POST request:", error));
 
   };
 
-  const validateData = () => {
+  const validateData = async () => {
     setUsernameTaken(false);
     setDataError(false);
 
-    if (username.length < 5 || password.length < 5){
+    if (username.length < 5 || password.length < 5) {
       setDataError(true);
       setUsername("");
       setPassword("");
     } else {
-    //before sending data it should check the db and see if there are any usernames that match
-    const dataToSend = {
+      //before sending data it should check the db and see if there are any usernames that match
+    const APIService = new APIcalls({
+        "itemID": "",
         "itemType": "User",
         "username": username,
+        "password": password,
         "operation": "Query"
-    }
-
-    console.log(JSON.stringify(dataToSend))
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataToSend),
-    };
-
-    fetch(
-      "https://1s6o72uevg.execute-api.ca-central-1.amazonaws.com/Dev/bookclub",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        //setResponse(data.body)
-        console.log(data.body)
-
-        if (data.body.length === 0){
-          console.log("nothing found, user can use this data")
-          sendCreateData();
-        } else {
-          console.log("taken = true")
-          setUsernameTaken(true);
-          setUsername("");
-          setPassword("");
-        }
       })
-      .catch((error) => console.error("Error making POST request:", error));
+      const fetchResponse = await APIService.callQuery();
+      console.log("End of fetchDataFromAPI:");
+      console.log(fetchResponse);
 
+      if (fetchResponse.body.length === 0) {
+        console.log("nothing found, user can use this data");
+        sendCreateData();
+      } else {
+        console.log("taken = true");
+        setUsernameTaken(true);
+        setUsername("");
+        setPassword("");
+      }
     }
-
   };
 
   return (
     <div className="container">
-      
       <h2>Create New Account:</h2>
       <div className="row">
         <label htmlFor="name-field">Username: </label>
@@ -134,9 +97,15 @@ function CreateAccountScreen(props) {
       </div>
 
       <button onClick={validateData}>Create Account</button>
-      {usernameTaken ? <p>Username is taken, please enter a new username.</p> : null}
-      {dataError ? <p>Username and Password must be longer than 4 characters.</p> : null}
-      {createAccountSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
+      {usernameTaken ? (
+        <p>Username is taken, please enter a new username.</p>
+      ) : null}
+      {dataError ? (
+        <p>Username and Password must be longer than 4 characters.</p>
+      ) : null}
+      {createAccountSuccess ? (
+        <Link to="/home">Success! Click to Continue</Link>
+      ) : null}
 
       {/* <ul>
         {response.map((user) => (
@@ -145,7 +114,6 @@ function CreateAccountScreen(props) {
           </li>
         ))}
       </ul> */}
-
     </div>
   );
 }

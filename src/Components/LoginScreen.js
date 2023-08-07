@@ -1,59 +1,87 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import APIcalls from "../Utils/APIcalls";
 
 function LoginScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //const [response, setResponse] = useState([]);
+  //const [response, setResponse] = useState({});
   const [IDCount, setIDCount] = useState(100);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginError, setLoginError] = useState(false);
 
-
-  const sendLoginData = () => {
-
+  const fetchDataFromApi = async () => {
     setLoginError(false);
     setLoginSuccess(false);
-    const dataToSend = {
+      console.log("calling api")
+      const APIService = new APIcalls({
+        "itemID": "",
         "itemType": "User",
         "username": username,
+        "password": password,
         "operation": "Query"
-    }
-
-    console.log(JSON.stringify(dataToSend))
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataToSend),
-    };
-
-    fetch(
-      "https://1s6o72uevg.execute-api.ca-central-1.amazonaws.com/Dev/bookclub",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        //setResponse(data);
-        console.log(data.body);
-        console.log(JSON.stringify(data.body))
-        if (data.body.length === 1 && data.body[0].Password === password){
-          //login data is detected and user should be logged in
-          setLoginSuccess(true);
-        } else {
-          setLoginError(true);
-        }
       })
-      .catch((error) => console.error("Error making POST request:", error));
+      const fetchResponse = await APIService.callQuery()
+      console.log("End of fetchDataFromAPI:")
+      console.log(fetchResponse)
+
+      if (fetchResponse.body.length === 1 && fetchResponse.body[0].Password === password){
+        //login data is detected and user should be logged in
+        setLoginSuccess(true);
+        setIDCount(IDCount + 1);
+        props.updateUserData(fetchResponse.body[0]);
+      } else {
+        setLoginError(true);
+      }
+      //console.log(response)
+  }
+
+  // const sendLoginData = () => {
+
+  //   setLoginError(false);
+  //   setLoginSuccess(false);
+  //   const dataToSend = {
+  //       "itemType": "User",
+  //       "username": username,
+  //       "operation": "Query"
+  //   }
+
+  //   console.log(JSON.stringify(dataToSend))
+
+  //   const requestOptions = {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(dataToSend),
+  //   };
+
+  //   fetch(
+  //     "https://1s6o72uevg.execute-api.ca-central-1.amazonaws.com/Dev/bookclub",
+  //     requestOptions
+  //   )
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       //setResponse(data);
+  //       console.log("HERE:")
+  //       console.log(data.body);
+  //       console.log(JSON.stringify(data.body))
+  //       if (data.body.length === 1 && data.body[0].Password === password){
+  //         //login data is detected and user should be logged in
+  //         setLoginSuccess(true);
+  //         setIDCount(IDCount + 1);
+  //         console.log(data.body[0])
+  //         props.updateUserData(data.body[0]);
+  //       } else {
+  //         setLoginError(true);
+  //       }
+  //     })
+  //     .catch((error) => console.error("Error making POST request:", error));
 
   
-      setIDCount(IDCount + 1);
-      props.updateLoginData({ username: username, password: password });
-
-  };
+      
+  // };
 
   return (
     <div className="container">
@@ -81,7 +109,7 @@ function LoginScreen(props) {
       {/* <Link to="/home" onClick={sendLoginData}>
         Enter
       </Link> */}
-      <button onClick={sendLoginData}>Login</button>
+      <button onClick={fetchDataFromApi}>Login</button>
       {loginSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
       {loginError ? <p>Error: Username or password incorrect, please try again</p> : null}
       {/* <ul>

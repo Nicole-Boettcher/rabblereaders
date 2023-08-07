@@ -9,7 +9,7 @@ import WelcomeScreen from "./Components/WelcomeScreen";
 function App() {
   //holds {username, password}, needs to be verified once server is running
   //search db for account, if so -> pull exsisting account details
-  const [loginData, setLoginData] = useState({});
+  const [userData, setUserData] = useState({});
   const [clubData, setClubData] = useState({});
   // const [IDCount, setIDCount] = useState({
   //   "user": 1,
@@ -17,8 +17,10 @@ function App() {
   // });
 
   //convention: if in parent function: updateBlank, if in child: sendBlank
-  const updateLoginData = (loginData) => {
-    setLoginData(loginData);
+  const updateUserData = (userData) => {
+    setUserData(userData);
+    console.log(`updating user data:`)
+    console.log(userData)
   };
 
   const updateClubData = (clubData) => {
@@ -39,16 +41,16 @@ function App() {
           <Route
             exact
             path="/createAccount"
-            element={<CreateAccountScreen updateLoginData={updateLoginData}/>}
+            element={<CreateAccountScreen updateUserData={updateUserData}/>}
           />
           <Route
             exact
             path="/login"
-            element={<LoginScreen updateLoginData={updateLoginData} />}
+            element={<LoginScreen updateUserData={updateUserData} />}
           />
           <Route
             path="/home"
-            element={<HomeScreen loginData={loginData} clubData={clubData} />}
+            element={<HomeScreen userData={userData} clubData={clubData} />}
           />
           <Route
             path="/createClub"
