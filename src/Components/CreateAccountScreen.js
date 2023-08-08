@@ -30,7 +30,12 @@ function CreateAccountScreen(props) {
 
         //setResponse(data.body)
         if (fetchResponse.statusCode === 200) {
-          props.updateUserData(fetchResponse.body[0]);
+          props.updateUserData({
+            "ItemID": IDCount,
+            "ItemType": "User",
+            "Username": username,
+            "Password": password
+          });
           setIDCount(IDCount + 1);
           setCreateAccountSuccess(true);
         } else {
