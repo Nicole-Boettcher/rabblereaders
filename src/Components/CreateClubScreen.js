@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 import { Link } from "react-router-dom";
+import { Button } from "bootstrap";
 
 function CreateClubScreen(props) {
   const [clubName, setClubName] = useState("");
@@ -8,20 +9,29 @@ function CreateClubScreen(props) {
   const [searchReponse, setSearchResponse] = useState([])
   const [invitedFriends, setInvitedFriends] = useState([])
   const [noNameFound, setNoNameFound] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(false)
+  const [createClubSuccess, setCreateClubSuccess] = useState(false)
 
 
   // Will have a list of friends and have a search bar for the admin to add certain friends to the club
 
+  const createClub = () => {
+    console.log("about to create club")
+    if (invitedFriends.length < 1 || clubName === "") {
+      setErrorMessage(true)
+      console.log("error")
+    } else {
+      setErrorMessage(false)
+      props.updateClubData({ name: clubName });
+      setCreateClubSuccess(true)
+    }
+  }
 
   const handleClick = () => {
     console.log("About to add ", searchName, " to invited list  response: ", searchReponse[0])
     setInvitedFriends(prevList => [...prevList, searchReponse[0]])
     setSearchName("")
     setSearchResponse([])
-  };
-
-  const sendClubData = () => {
-    props.updateClubData({ name: clubName });
   };
 
   const searchByName = async () => {
@@ -74,7 +84,7 @@ function CreateClubScreen(props) {
       <ul>
       {searchReponse.map((user) => (
         <li key={user.ItemID}>
-          Username: {user.Username}
+          Username: {user.Username}   
           <button onClick={handleClick}>Invite friend</button>
         </li>
       ))}
@@ -83,15 +93,16 @@ function CreateClubScreen(props) {
       <h3>Invited friends:</h3>
       {invitedFriends.map((user) => (
         <li key={user.ItemID}>
-          {user.Username}
+          Username: {user.Username}, ID: {user.ItemID}
         </li>
       ))}
 
       {/* the no space before link was annoying */}
       <p></p>  
-      <Link to="/home" onClick={sendClubData} >
-        Make Club
-      </Link>
+      <button onClick={createClub}>Create Club!</button>
+      {createClubSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
+      {errorMessage && <p>Error creating club, no name entered or no people invited</p>}
+
     </div>
   );
 }
