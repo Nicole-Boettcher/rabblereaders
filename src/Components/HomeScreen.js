@@ -15,6 +15,7 @@ function HomeScreen(props) {
   useEffect(() => {
     console.log("Setting")
     window.localStorage.setItem('USER_DATA_HOME', JSON.stringify(userData));
+    props.updateUserData(userData)
   }, [userData])
   // TODO: MAKE ABOVE RELOAD ONLY WHEN PAGE IS AUTOMATICALLY REFRESHED
 
@@ -24,12 +25,15 @@ function HomeScreen(props) {
 
   return (
     <div>
-      <h1>Home Screen</h1>
+      <h1 style={{ textAlign: 'center' }}>Home Screen</h1>
       {userData && <p>Username: {userData.Username}</p>}
       {/* <p style={{ textAlign: 'right' }}>Password: {props.loginData.password}</p> */}
 
-      <p>Current Book Clubs:</p>
-      <p>{props.clubData.name}</p>
+      {/* <p>Current Book Clubs:</p>
+      <p>{props.clubData.name}</p> */}
+
+      <h3>Club Invites:</h3>
+      <p>{userData.ClubInvites}</p>
 
       <Link to="/createClub">Create a New Club</Link>
     </div>

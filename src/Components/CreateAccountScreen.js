@@ -9,7 +9,6 @@ function CreateAccountScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   //const [response, setResponse] = useState([]);
-  const [IDCount, setIDCount] = useState(6);
   const [usernameTaken, setUsernameTaken] = useState(false);
   const [dataError, setDataError] = useState(false);
   const [createAccountSuccess, setCreateAccountSuccess] = useState(false);
@@ -18,7 +17,6 @@ function CreateAccountScreen(props) {
     //before sending data it should check the db and see if there are any usernames that match
 
     const APIService = new APIcalls({
-      "itemID": IDCount,
       "itemType": "User",
       "username": username,
       "password": password,
@@ -31,12 +29,10 @@ function CreateAccountScreen(props) {
         //setResponse(data.body)
         if (fetchResponse.statusCode === 200) {
           props.updateUserData({
-            "ItemID": IDCount,
             "ItemType": "User",
             "Username": username,
             "Password": password
           });
-          setIDCount(IDCount + 1);
           setCreateAccountSuccess(true);
         } else {
           console.error("ERROR");

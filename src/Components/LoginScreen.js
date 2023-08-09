@@ -6,8 +6,6 @@ import APIcalls from "../Utils/APIcalls";
 function LoginScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //const [response, setResponse] = useState({});
-  const [IDCount, setIDCount] = useState(100);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginError, setLoginError] = useState(false);
 
@@ -29,7 +27,6 @@ function LoginScreen(props) {
       if (fetchResponse.body.length === 1 && fetchResponse.body[0].Password === password){
         //login data is detected and user should be logged in
         setLoginSuccess(true);
-        setIDCount(IDCount + 1);
         props.updateUserData(fetchResponse.body[0]);
       } else {
         setLoginError(true);

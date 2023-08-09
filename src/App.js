@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
 import LoginScreen from "./Components/LoginScreen";
 import HomeScreen from "./Components/HomeScreen";
 import CreateClubScreen from "./Components/CreateClubScreen";
@@ -27,10 +27,17 @@ function App() {
     setClubData(clubData);
   };
 
+  const logOut = () => {
+    setUserData({})
+    window.localStorage.removeItem('USER_DATA_HOME')
+  }
+
   return (
     <BrowserRouter>
       <div className="App">
         <h1 style={{ textAlign: 'center' }}>Welcome to Rabble Readers</h1>
+        <Link to="/" onClick={logOut}>Log out</Link>
+
 
         <Routes>
           <Route
@@ -50,11 +57,11 @@ function App() {
           />
           <Route
             path="/home"
-            element={<HomeScreen userData={userData} clubData={clubData} />}
+            element={<HomeScreen userData={userData} clubData={clubData} updateUserData={updateUserData}/>}
           />
           <Route
             path="/createClub"
-            element={<CreateClubScreen updateClubData={updateClubData} />}
+            element={<CreateClubScreen userData={userData} />}
           />
         </Routes>
       </div>

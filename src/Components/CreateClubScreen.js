@@ -12,17 +12,49 @@ function CreateClubScreen(props) {
   const [errorMessage, setErrorMessage] = useState(false)
   const [createClubSuccess, setCreateClubSuccess] = useState(false)
 
-
-  // Will have a list of friends and have a search bar for the admin to add certain friends to the club
-
-  const createClub = () => {
+  const createClub = async () => {
     console.log("about to create club")
     if (invitedFriends.length < 1 || clubName === "") {
       setErrorMessage(true)
       console.log("error")
     } else {
+      //call API for each user in the invited list and add an invite to their properties
+      //TODO: overwrites last club invite, make it so it creates a list
+      for (let i = 0; i < invitedFriends.length; i++){
+        let friend = invitedFriends[i]
+        const APIService = new APIcalls({
+          "itemID": friend.ItemID,
+          "itemType": "User",
+          "username": friend.Username,
+          "password": friend.Password,
+          "operation": "UpdateItem",
+          "newClubInvite": clubName
+        })
+        const fetchResponse = await APIService.callQuery()
+        console.log("Search response:")
+        console.log(fetchResponse)
+
+        if (fetchResponse.statusCode != 200){
+          console.error("ERROR setting club invite")
+        }
+      }
+
+      //create new club object - properties: name (username), admin, members, pending members 
+
+      console.log(props.userData.Username)
+      const APIServiceClub = new APIcalls({
+        "itemID": 1,
+        "itemType": "Club",
+        "username": clubName,
+        "admin": props.userData.ItemID,
+        "operation": "PutItem"
+      })
+      const fetchResponse = await APIServiceClub.callQuery()
+      console.log("Search response:")
+      console.log(fetchResponse)
+
+
       setErrorMessage(false)
-      props.updateClubData({ name: clubName });
       setCreateClubSuccess(true)
     }
   }
