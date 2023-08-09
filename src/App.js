@@ -11,10 +11,6 @@ function App() {
   //search db for account, if so -> pull exsisting account details
   const [userData, setUserData] = useState({});
   const [clubData, setClubData] = useState({});
-  // const [IDCount, setIDCount] = useState({
-  //   "user": 1,
-  //   "club": 1
-  // });
 
   //convention: if in parent function: updateBlank, if in child: sendBlank
   const updateUserData = (userData) => {

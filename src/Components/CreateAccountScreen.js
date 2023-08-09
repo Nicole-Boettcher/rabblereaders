@@ -14,7 +14,6 @@ function CreateAccountScreen(props) {
   const [createAccountSuccess, setCreateAccountSuccess] = useState(false);
 
   const sendCreateData = async () => {
-    //before sending data it should check the db and see if there are any usernames that match
 
     const APIService = new APIcalls({
       "itemType": "User",
@@ -29,6 +28,7 @@ function CreateAccountScreen(props) {
         //setResponse(data.body)
         if (fetchResponse.statusCode === 200) {
           props.updateUserData({
+            "ItemID": fetchResponse.id,
             "ItemType": "User",
             "Username": username,
             "Password": password

@@ -28,7 +28,8 @@ function CreateClubScreen(props) {
           "username": friend.Username,
           "password": friend.Password,
           "operation": "UpdateItem",
-          "newClubInvite": clubName
+          "updateExpression": "SET",
+          "clubInvite": clubName
         })
         const fetchResponse = await APIService.callQuery()
         console.log("Search response:")
@@ -43,7 +44,6 @@ function CreateClubScreen(props) {
 
       console.log(props.userData.Username)
       const APIServiceClub = new APIcalls({
-        "itemID": 1,
         "itemType": "Club",
         "username": clubName,
         "admin": props.userData.ItemID,
