@@ -50,8 +50,18 @@ function CreateClubScreen(props) {
         "operation": "PutItem"
       })
       const fetchResponse = await APIServiceClub.callQuery()
-      console.log("Search response:")
+      console.log("Create new club response:")
       console.log(fetchResponse)
+
+      //add admin as a member to the club
+      const APIServiceClub2 = new APIcalls({
+        "itemID": fetchResponse.id,
+        "itemType": "Club",
+        "memberIDs": props.userData.ItemID,
+        "operation": "UpdateItem",
+        "updateExpression": "SET"
+      })
+      await APIServiceClub2.callQuery()
 
 
       setErrorMessage(false)

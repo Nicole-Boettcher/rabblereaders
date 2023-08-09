@@ -18,14 +18,11 @@ function HomeScreen(props) {
     window.localStorage.setItem('USER_DATA_HOME', JSON.stringify(userData));
     props.updateUserData(userData)
   }, [userData])
-  // TODO: MAKE ABOVE RELOAD ONLY WHEN PAGE IS AUTOMATICALLY REFRESHED
-
-  // if (!userData) {
-  //   return <div>Loading...</div>;
-  // }
 
   const acceptClubInvite = async () => {
     //call API to add user ID to the club objects membersIDs list
+
+    //to get clubID
     const APIService = new APIcalls({
       "itemType": "Club",
       "username": userData.ClubInvites,
@@ -37,7 +34,7 @@ function HomeScreen(props) {
 
     const clubID = fetchResponse.body[0].ItemID;
 
-
+    //add member ID to club object
     const APIService2 = new APIcalls({
       "itemID": clubID,
       "itemType": "Club",
@@ -47,8 +44,7 @@ function HomeScreen(props) {
     })
     const fetchResponse2 = await APIService2.callQuery()  //check its valid and worked
 
-    //remove club invite at the end 
-
+    //remove club invite from user
     const APIService3 = new APIcalls({
       "itemID": userData.ItemID,
       "itemType": "User",
@@ -58,6 +54,17 @@ function HomeScreen(props) {
     })
     const fetchResponse3 = await APIService3.callQuery()  //check its valid and worked
 
+    console.log("gonna add club to profile")
+    //add exsisting clubs to user
+    const APIService4 = new APIcalls({
+      "itemID": userData.ItemID,
+      "itemType": "User",
+      "newClub": clubID,  //add the club ID to an attribute called "clubs" under the user 
+      "operation": "UpdateItem",
+      "updateExpression": "SET"
+    })
+    const fetchResponse4 = await APIService4.callQuery()  //check its valid and worked
+    console.log(fetchResponse4)
   }
 
 
@@ -72,7 +79,11 @@ function HomeScreen(props) {
 
       <h3>Club Invites:</h3>
       <p>{userData.ClubInvites}</p>
-      <button onClick={acceptClubInvite}>Accept Club Invite</button>
+      {userData.ClubInvites && <button onClick={acceptClubInvite}>Accept Club Invite</button>}
+
+      <h3>Current Clubs:</h3>
+      {/* show current clubs here, need to fetch data based on the id, can use a simple key look up, need to update lambda GetItem*/}
+      
 
       <p></p>
       <Link to="/createClub">Create a New Club</Link>
