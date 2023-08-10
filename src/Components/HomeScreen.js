@@ -64,7 +64,7 @@ function HomeScreen(props) {
       "updateExpression": "SET"
     })
     const fetchResponse4 = await APIService4.callQuery()  //check its valid and worked
-    console.log(fetchResponse4)
+    setUserData(fetchResponse4.body['Attributes'])  //flow here is this calls the local state which then triggers the UseEffect which sets the local storage with the new User then calls the App.js userData 
   }
 
 

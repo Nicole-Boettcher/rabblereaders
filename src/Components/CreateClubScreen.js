@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 import { Link } from "react-router-dom";
-import { Button } from "bootstrap";
+import './CreateClubScreen.css';
 
 function CreateClubScreen(props) {
   const [clubName, setClubName] = useState("");
@@ -55,13 +55,24 @@ function CreateClubScreen(props) {
 
       //add admin as a member to the club
       const APIServiceClub2 = new APIcalls({
-        "itemID": fetchResponse.id,
+        "itemID": fetchResponse.id, //right not manually returning the id, could change it to the updateItem way of returning the whole objects attributes 
         "itemType": "Club",
         "memberIDs": props.userData.ItemID,
         "operation": "UpdateItem",
         "updateExpression": "SET"
       })
       await APIServiceClub2.callQuery()
+
+      //add club name to user profile?
+
+      const APIService3 = new APIcalls({
+        "itemID": props.userData.ItemID,
+        "itemType": "User",
+        "newClub": fetchResponse.id,  //add the club ID to an attribute called "clubs" under the user 
+        "operation": "UpdateItem",
+        "updateExpression": "SET"
+      })
+      const fetchResponse3 = await APIService3.callQuery()  //check its valid and worked
 
 
       setErrorMessage(false)
@@ -97,11 +108,28 @@ function CreateClubScreen(props) {
 
   };
 
+  const updateUserData = async () => {
+    const APIService = new APIcalls({
+      "itemID": props.userData.ItemID,
+      "itemType": "User",
+      "operation": "GetItem"
+    })
+    const fetchResponse = await APIService.callQuery()
+    console.log("Get updated User now:")
+    console.log(fetchResponse)
+    if (fetchResponse.statusCode === 200) {
+       props.updateUserData(fetchResponse.body)
+    } else {
+      console.log("ERROR, could not find User by ID")
+    }
+
+  };
+
   return (
     <div className="container">
-      <h2>Create a New Club:</h2>
-
-      <div className="row">
+      <h2 className="title">Create a New Club:</h2>
+  
+      <div className="row form-group">
         <label htmlFor="clubName-field">Club Name: </label>
         <input
           id="clubName-field"
@@ -110,7 +138,10 @@ function CreateClubScreen(props) {
           value={clubName}
           onChange={(e) => setClubName(e.target.value)}
         />
-        <h3>Invite people to your bookclub!</h3>
+      </div>
+  
+      <h3 className="title invite-section">Invite people to your bookclub!</h3>
+      <div className="row form-group">
         <label htmlFor="name-field">Search by Name: </label>
         <input
           id="name-field"
@@ -120,33 +151,87 @@ function CreateClubScreen(props) {
           onChange={(e) => setSearchName(e.target.value)}
         />
       </div>
-      <button onClick={searchByName}>Search</button>
-      {noNameFound && <p>No user found, try again</p>}
-
-      <ul>
-      {searchReponse.map((user) => (
-        <li key={user.ItemID}>
-          Username: {user.Username}   
-          <button onClick={handleClick}>Invite friend</button>
-        </li>
-      ))}
+      <button className="search-button" onClick={searchByName}>Search</button>
+      {noNameFound && <p className="error-text">No user found, try again</p>}
+  
+      <ul className="user-list">
+        {searchReponse.map((user) => (
+          <li className="user-item" key={user.ItemID}>
+            <span className="username">Username: {user.Username}</span>
+            <button className="invite-button" onClick={handleClick}>Invite friend</button>
+          </li>
+        ))}
       </ul>
-
-      <h3>Invited friends:</h3>
-      {invitedFriends.map((user) => (
-        <li key={user.ItemID}>
-          Username: {user.Username}, ID: {user.ItemID}
-        </li>
-      ))}
-
-      {/* the no space before link was annoying */}
-      <p></p>  
-      <button onClick={createClub}>Create Club!</button>
-      {createClubSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
-      {errorMessage && <p>Error creating club, no name entered or no people invited</p>}
-
+  
+      <h3 className="title">Invited friends:</h3>
+      <ul className="invited-list">
+        {invitedFriends.map((user) => (
+          <li className="invited-item" key={user.ItemID}>
+            <span className="username">Username: {user.Username}</span>
+            <span className="user-id">ID: {user.ItemID}</span>
+          </li>
+        ))}
+      </ul>
+  
+      {/* Add some spacing */}
+      <p></p>
+  
+      <button className="create-button" onClick={createClub}>Create Club!</button>
+      {createClubSuccess && <Link className="success-link" to="/home" onClick={updateUserData}>Success! Click to Continue</Link>}
+      {errorMessage && <p className="error-text">Error creating club, no name entered or no people invited</p>}
     </div>
   );
+  
+  // return (
+  //   <div className="container">
+  //     <h2>Create a New Club:</h2>
+
+  //     <div className="row">
+  //       <label htmlFor="clubName-field">Club Name: </label>
+  //       <input
+  //         id="clubName-field"
+  //         type="text"
+  //         className="form-control"
+  //         value={clubName}
+  //         onChange={(e) => setClubName(e.target.value)}
+  //       />
+  //       <h3>Invite people to your bookclub!</h3>
+  //       <label htmlFor="name-field">Search by Name: </label>
+  //       <input
+  //         id="name-field"
+  //         type="text"
+  //         className="form-control"
+  //         value={searchName}
+  //         onChange={(e) => setSearchName(e.target.value)}
+  //       />
+  //     </div>
+  //     <button className="search-button" onClick={searchByName}>Search</button>
+  //     {noNameFound && <p>No user found, try again</p>}
+
+  //     <ul>
+  //     {searchReponse.map((user) => (
+  //       <li key={user.ItemID}>
+  //         Username: {user.Username}   
+  //         <button onClick={handleClick}>Invite friend</button>
+  //       </li>
+  //     ))}
+  //     </ul>
+
+  //     <h3>Invited friends:</h3>
+  //     {invitedFriends.map((user) => (
+  //       <li key={user.ItemID}>
+  //         Username: {user.Username}, ID: {user.ItemID}
+  //       </li>
+  //     ))}
+
+  //     {/* the no space before link was annoying */}
+  //     <p></p>  
+  //     <button className="create-button" onClick={createClub}>Create Club!</button>
+  //     {createClubSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
+  //     {errorMessage && <p>Error creating club, no name entered or no people invited</p>}
+
+  //   </div>
+  // );
 }
 
 export default CreateClubScreen;

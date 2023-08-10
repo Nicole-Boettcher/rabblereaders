@@ -31,8 +31,11 @@ function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        <h1 style={{ textAlign: 'center' }}>Welcome to Rabble Readers</h1>
-        <Link to="/" onClick={logOut}>Log out</Link>
+        < div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ textAlign: 'center', margin: '0' }}>Welcome to Rabble Readers</h1>
+          <Link to="/" onClick={logOut} style={{ marginLeft: '10px' }}>Log out</Link>
+        </div>
+
 
 
         <Routes>
@@ -57,7 +60,7 @@ function App() {
           />
           <Route
             path="/createClub"
-            element={<CreateClubScreen userData={userData} />}
+            element={<CreateClubScreen userData={userData} updateUserData={updateUserData}/>}
           />
         </Routes>
       </div>
