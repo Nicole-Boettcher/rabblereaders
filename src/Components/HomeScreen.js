@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 
@@ -7,17 +7,43 @@ function HomeScreen(props) {
   //when this page first loads, it should take the user data and fetch the profile from the db so it is saved
   const [userData, setUserData] = useState(props.userData); // Use storedUserData as initial state
 
-  useEffect(() => {
-    console.log("Getting")
-    const data = window.localStorage.getItem('USER_DATA_HOME');
-    if (data !== null ) setUserData(JSON.parse(data));
-  }, []);
+  // useEffect(() => {
+  //   console.log("Getting")
+  //   const data = window.localStorage.getItem('USER_DATA_HOME');
+  //   if (data !== null ) setUserData(JSON.parse(data));
+  // }, []);
+  
 
   useEffect(() => {
-    console.log("Setting")
-    window.localStorage.setItem('USER_DATA_HOME', JSON.stringify(userData));
-    props.updateUserData(userData)
-  }, [userData])
+
+    async function fetchData() {
+      console.log("Call API to get userInfo")
+
+      const APIService = new APIcalls({
+        "itemID": props.userData.ItemID,
+        "itemType": "User",
+        "operation": "GetItem"
+      })
+      const fetchResponse = await APIService.callQuery()
+      console.log("Get updated User now:")
+      console.log(fetchResponse)
+      if (fetchResponse.statusCode === 200) {
+         setUserData(fetchResponse.body)
+      } else {
+        console.log("ERROR, could not find User by ID")
+      }
+    }
+
+    fetchData()
+
+  }, [window.location.href]);
+
+
+  // useEffect(() => {
+  //   console.log("Setting")
+  //   window.localStorage.setItem('USER_DATA_HOME', JSON.stringify(userData));
+  //   props.updateUserData(userData)
+  // }, [userData])
 
   const acceptClubInvite = async () => {
     //call API to add user ID to the club objects membersIDs list
@@ -72,6 +98,7 @@ function HomeScreen(props) {
     <div>
       <h1 style={{ textAlign: 'center' }}>Home Screen</h1>
       {userData && <p>Username: {userData.Username}</p>}
+      {userData.Clubs && <p>Clubs: {userData.Clubs}</p>}
       {/* <p style={{ textAlign: 'right' }}>Password: {props.loginData.password}</p> */}
 
       {/* <p>Current Book Clubs:</p>
@@ -84,7 +111,6 @@ function HomeScreen(props) {
       <h3>Current Clubs:</h3>
       {/* show current clubs here, need to fetch data based on the id, can use a simple key look up, need to update lambda GetItem*/}
       
-
       <p></p>
       <Link to="/createClub">Create a New Club</Link>
     </div>

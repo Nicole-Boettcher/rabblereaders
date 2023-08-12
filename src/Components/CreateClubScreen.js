@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 import { Link } from "react-router-dom";
 import './CreateClubScreen.css';
+import womanReading from "./woman1.png";
 
 function CreateClubScreen(props) {
   const [clubName, setClubName] = useState("");
@@ -74,7 +75,6 @@ function CreateClubScreen(props) {
       })
       const fetchResponse3 = await APIService3.callQuery()  //check its valid and worked
 
-
       setErrorMessage(false)
       setCreateClubSuccess(true)
     }
@@ -108,22 +108,22 @@ function CreateClubScreen(props) {
 
   };
 
-  const updateUserData = async () => {
-    const APIService = new APIcalls({
-      "itemID": props.userData.ItemID,
-      "itemType": "User",
-      "operation": "GetItem"
-    })
-    const fetchResponse = await APIService.callQuery()
-    console.log("Get updated User now:")
-    console.log(fetchResponse)
-    if (fetchResponse.statusCode === 200) {
-       props.updateUserData(fetchResponse.body)
-    } else {
-      console.log("ERROR, could not find User by ID")
-    }
+  // const updateUserData = async () => {
+  //   const APIService = new APIcalls({
+  //     "itemID": props.userData.ItemID,
+  //     "itemType": "User",
+  //     "operation": "GetItem"
+  //   })
+  //   const fetchResponse = await APIService.callQuery()
+  //   console.log("Get updated User now:")
+  //   console.log(fetchResponse)
+  //   if (fetchResponse.statusCode === 200) {
+  //      props.updateUserData(fetchResponse.body)
+  //   } else {
+  //     console.log("ERROR, could not find User by ID")
+  //   }
 
-  };
+  // };
 
   return (
     <div className="container">
@@ -177,8 +177,15 @@ function CreateClubScreen(props) {
       <p></p>
   
       <button className="create-button" onClick={createClub}>Create Club!</button>
-      {createClubSuccess && <Link className="success-link" to="/home" onClick={updateUserData}>Success! Click to Continue</Link>}
+      {createClubSuccess && <Link className="success-link" to="/home">Success! Click to Continue</Link>}
       {errorMessage && <p className="error-text">Error creating club, no name entered or no people invited</p>}
+
+
+      <div className="cartoon-images">
+        {/* <img src="woman1.png" alt="Cartoon Woman 1" /> */}
+        <img src={womanReading} alt="Cartoon Woman 2" />
+      </div>
+
     </div>
   );
   
