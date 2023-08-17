@@ -5,12 +5,13 @@ import HomeScreen from "./Components/HomeScreen";
 import CreateClubScreen from "./Components/CreateClubScreen";
 import CreateAccountScreen from "./Components/CreateAccountScreen";
 import WelcomeScreen from "./Components/WelcomeScreen";
+import ClubHomeScreen from "./Components/ClubHomeScreen";
 
 function App() {
   //holds {username, password}, needs to be verified once server is running
   //search db for account, if so -> pull exsisting account details
   const [userData, setUserData] = useState({});
-  const [clubData, setClubData] = useState({});
+  const [clubSelection, setClubSelection] = useState({});
 
   //convention: if in parent function: updateBlank, if in child: sendBlank
   const updateUserData = (userData) => {
@@ -19,13 +20,14 @@ function App() {
     console.log(userData)
   };
 
-  const updateClubData = (clubData) => {
-    setClubData(clubData);
+  const updateClubSelection = (clubSelection) => {
+    console.log("update club selection with: ", clubSelection)
+    setClubSelection(clubSelection);
   };
 
   const logOut = () => {
     setUserData({})
-    window.localStorage.removeItem('USER_DATA_HOME')
+    window.localStorage.removeItem('USER_ID')
   }
 
   return (
@@ -56,12 +58,17 @@ function App() {
           />
           <Route
             path="/home"
-            element={<HomeScreen userData={userData} clubData={clubData} updateUserData={updateUserData}/>}
+            element={<HomeScreen userData={userData} updateClubSelection={updateClubSelection}/>}
           />
           <Route
             path="/createClub"
-            element={<CreateClubScreen userData={userData} updateUserData={updateUserData}/>}
+            element={<CreateClubScreen/>}
           />
+          <Route
+            path="/clubHome"
+            element={<ClubHomeScreen clubSelection={clubSelection}/>}
+          />
+
         </Routes>
       </div>
     </BrowserRouter>

@@ -5,22 +5,33 @@ import APIcalls from "../Utils/APIcalls";
 
 function HomeScreen(props) {
   //when this page first loads, it should take the user data and fetch the profile from the db so it is saved
-  const [userData, setUserData] = useState(props.userData); // Use storedUserData as initial state
+  const [userData, setUserData] = useState(""); // Use storedUserData as initial state
+  const [clubDetails, setClubDetails] = useState([]);
 
-  // useEffect(() => {
-  //   console.log("Getting")
-  //   const data = window.localStorage.getItem('USER_DATA_HOME');
-  //   if (data !== null ) setUserData(JSON.parse(data));
-  // }, []);
+  useEffect(() => {
+    if (userData !== "") {
+      console.log("Set user data ID")
+      const data = window.localStorage.setItem('USER_ID', JSON.stringify(userData.ItemID));
+    }
+  }, [userData]);
   
 
   useEffect(() => {
 
     async function fetchData() {
-      console.log("Call API to get userInfo")
+      console.log("Call API to get userInfo: ", props.userData.ItemID)
+    
+      let id = props.userData.ItemID
+
+      if (id === undefined) {
+        //need to get ID from local storage 
+        console.log("grabbing id from local storage")
+        const data = window.localStorage.getItem('USER_ID')
+        id = JSON.parse(data)
+      }
 
       const APIService = new APIcalls({
-        "itemID": props.userData.ItemID,
+        "itemID": id,
         "itemType": "User",
         "operation": "GetItem"
       })
@@ -38,12 +49,31 @@ function HomeScreen(props) {
 
   }, [window.location.href]);
 
+  useEffect(() => {
 
-  // useEffect(() => {
-  //   console.log("Setting")
-  //   window.localStorage.setItem('USER_DATA_HOME', JSON.stringify(userData));
-  //   props.updateUserData(userData)
-  // }, [userData])
+    async function getClubNames() {
+      setClubDetails([])
+      console.log("clear clubs: ", clubDetails)
+      console.log("userdata.Clubs length: ", userData.Clubs.length)
+
+      for (let i = 0; i < userData.Clubs.length; i++){
+        let clubID = userData.Clubs[i]
+        const APIService = new APIcalls({
+          "itemID": clubID,
+          "itemType": "Club",
+          "operation": "GetItem"
+        })
+        const fetchResponse = await APIService.callQuery()
+        console.log("Fetching names of current clubs: ", fetchResponse.body)
+
+        setClubDetails(prevList => [...prevList, fetchResponse.body])
+      }
+    }
+
+    if (userData.Clubs) getClubNames()
+
+  }, [userData.Clubs])
+
 
   const acceptClubInvite = async () => {
     //call API to add user ID to the club objects membersIDs list
@@ -98,7 +128,6 @@ function HomeScreen(props) {
     <div>
       <h1 style={{ textAlign: 'center' }}>Home Screen</h1>
       {userData && <p>Username: {userData.Username}</p>}
-      {userData.Clubs && <p>Clubs: {userData.Clubs}</p>}
       {/* <p style={{ textAlign: 'right' }}>Password: {props.loginData.password}</p> */}
 
       {/* <p>Current Book Clubs:</p>
@@ -109,6 +138,16 @@ function HomeScreen(props) {
       {userData.ClubInvites && <button onClick={acceptClubInvite}>Accept Club Invite</button>}
 
       <h3>Current Clubs:</h3>
+
+      <ul>
+        {clubDetails.map((club) => (
+          <li key={club.ItemID}>
+            <span >{club.Username}  </span>
+            <Link to="/clubHome" onClick={() => props.updateClubSelection(club)}>    Go To!</Link>
+          </li>
+        ))}
+      </ul>
+
       {/* show current clubs here, need to fetch data based on the id, can use a simple key look up, need to update lambda GetItem*/}
       
       <p></p>

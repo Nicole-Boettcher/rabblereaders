@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import APIcalls from "../Utils/APIcalls";
 import { Link } from "react-router-dom";
 import './CreateClubScreen.css';
@@ -12,6 +12,15 @@ function CreateClubScreen(props) {
   const [noNameFound, setNoNameFound] = useState(false)
   const [errorMessage, setErrorMessage] = useState(false)
   const [createClubSuccess, setCreateClubSuccess] = useState(false)
+  const [userID, setUserID] = useState("");
+
+
+  useEffect(() => {
+     console.log("Get user data ID")
+     const data = window.localStorage.getItem('USER_ID');
+     setUserID(JSON.parse(data))
+  }, []);
+
 
   const createClub = async () => {
     console.log("about to create club")
@@ -43,11 +52,10 @@ function CreateClubScreen(props) {
 
       //create new club object - properties: name (username), admin, members, pending members 
 
-      console.log(props.userData.Username)
       const APIServiceClub = new APIcalls({
         "itemType": "Club",
         "username": clubName,
-        "admin": props.userData.ItemID,
+        "admin": userID,
         "operation": "PutItem"
       })
       const fetchResponse = await APIServiceClub.callQuery()
@@ -58,7 +66,7 @@ function CreateClubScreen(props) {
       const APIServiceClub2 = new APIcalls({
         "itemID": fetchResponse.id, //right not manually returning the id, could change it to the updateItem way of returning the whole objects attributes 
         "itemType": "Club",
-        "memberIDs": props.userData.ItemID,
+        "memberIDs": userID,
         "operation": "UpdateItem",
         "updateExpression": "SET"
       })
@@ -67,7 +75,7 @@ function CreateClubScreen(props) {
       //add club name to user profile?
 
       const APIService3 = new APIcalls({
-        "itemID": props.userData.ItemID,
+        "itemID": userID,
         "itemType": "User",
         "newClub": fetchResponse.id,  //add the club ID to an attribute called "clubs" under the user 
         "operation": "UpdateItem",
@@ -107,23 +115,6 @@ function CreateClubScreen(props) {
     }
 
   };
-
-  // const updateUserData = async () => {
-  //   const APIService = new APIcalls({
-  //     "itemID": props.userData.ItemID,
-  //     "itemType": "User",
-  //     "operation": "GetItem"
-  //   })
-  //   const fetchResponse = await APIService.callQuery()
-  //   console.log("Get updated User now:")
-  //   console.log(fetchResponse)
-  //   if (fetchResponse.statusCode === 200) {
-  //      props.updateUserData(fetchResponse.body)
-  //   } else {
-  //     console.log("ERROR, could not find User by ID")
-  //   }
-
-  // };
 
   return (
     <div className="container">
