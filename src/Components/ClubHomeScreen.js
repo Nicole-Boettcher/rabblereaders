@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import APIcalls from "../Utils/APIcalls";
+import './ClubHomeScreen.css'
 
 function ClubHomeScreen(props) {
   //want this page to scroll fancily 
@@ -12,6 +13,8 @@ function ClubHomeScreen(props) {
   const [membersData, setMembersData] = useState([]);
   const [selectedValue, setSelectedValue] = useState('');
   const [displaySelectAdmin, setDisplaySelectAdmin] = useState(true);
+
+  const [tabSelect, setTabSelect] = useState(1);
 
   useEffect(() => {
     if (clubData !== "") {
@@ -128,29 +131,71 @@ function ClubHomeScreen(props) {
     setDisplaySelectAdmin(false)
   }
 
+  const updateTabSelect = (tab) => {
+    setTabSelect(tab);
+  }
+
+  const what = () => {
+    
+  }
+
   return (
-    <div>
-      <h1 style={{ textAlign: 'center' }}>{clubData.Username}</h1>
+    <div className="container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ margin: '0' }}>{clubData.Username}</h1>
+        <ul className="tabs-container">
+          <li className="tabs" onClick={() => updateTabSelect(1)}>Home</li>
+          <li className="tabs" onClick={() => updateTabSelect(2)}>Book Selection</li>
+          <li className="tabs" onClick={() => updateTabSelect(3)}>History</li>
+          <li className="tabs" onClick={() => updateTabSelect(4)}>Members</li>
+        </ul>
+      </div>
+ 
       <p></p>
 
-      {/* should first check if club has an admin first */}
-      {!clubData.CurrentAdmin && displaySelectAdmin && (
-      <div>
-        <h3>Select an Admin for this Book Cycle:</h3>
-        <select value={selectedValue} onChange={handleDropdownChange}>
-          <option value="">Select an option</option>
-          {membersData.map((member) => (
-            <option key={member.ItemID} value={member.ItemID}>
-              {member.Username}
-            </option>
-          ))}
-        </select>
-        {selectedValue && (<button onClick={ () => selectAdmin(selectedValue)}>Confirm {selectedValue.Username} as Admin</button>)}
+      <div className={tabSelect === 1 ? "show-content" : "content"}>
+
+
+        {/* should first check if club has an admin first */}
+        {!clubData.CurrentAdmin && displaySelectAdmin && (
+        <div>
+          <h3>Select an Admin for this Book Cycle:</h3>
+          <select value={selectedValue} onChange={handleDropdownChange}>
+            <option value="">Select an option</option>
+            {membersData.map((member) => (
+              <option key={member.ItemID} value={member.ItemID}>
+                {member.Username}
+              </option>
+            ))}
+          </select>
+          {selectedValue && (<button onClick={ () => selectAdmin(selectedValue)}>Confirm {selectedValue.Username} as Admin</button>)}
+        </div>
+        )}
+
+        {clubData.CurrentAdmin && <p>This cycles admin is: {clubData.CurrentAdmin.Username}</p>}
+
+
       </div>
-      )}
+      {/* if you are the admin you should pick the book and its details  */}
+      {/* One tab should be named Book Selection and to fill out the form you must be the current admin  */}
 
-      {clubData.CurrentAdmin && <p>This cycles admin is: {clubData.CurrentAdmin.Username}</p>}
 
+      <div className={tabSelect === 2 ? "show-content" : "content"}>
+        {clubData.CurrentAdmin && (
+          <div>
+            {clubData.CurrentAdmin.ItemID === JSON.parse(window.localStorage.getItem('USER_ID')) && <p>Admin can only see this</p>}
+            {clubData.CurrentAdmin.ItemID !== JSON.parse(window.localStorage.getItem('USER_ID')) && <p>You do not have access to this page, only current admin does</p>}
+          </div>
+        )}
+      </div>
+
+      <div className={tabSelect === 3 ? "show-content" : "content"}>
+        <p>Tab 3</p>
+      </div>
+
+      <div className={tabSelect === 4 ? "show-content" : "content"}>
+        <p>Tab 4</p>
+      </div>
     </div>
   );
 }

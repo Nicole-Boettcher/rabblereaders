@@ -1,0 +1,27 @@
+.content {
+    display: none;
+}
+
+.show-content{
+    display: block;
+}
+
+.tabs-container {
+    list-style: none;
+    display: flex;
+    justify-content: flex-end; /* Align tabs to the right */
+    margin-right: 20px; /* Add some margin from the right edge */
+  }
+  
+  .tabs {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+    margin-left: 10px; /* Add some spacing between tabs */
+    border-radius: 5px;
+  }
+  
+  .tabs:hover {
+    background-color: #e0e0e0;
+  }
