@@ -7,6 +7,7 @@ function HomeScreen(props) {
   //when this page first loads, it should take the user data and fetch the profile from the db so it is saved
   const [userData, setUserData] = useState(""); // Use storedUserData as initial state
   const [clubDetails, setClubDetails] = useState([]);
+  const [clubLinkReady, setClubLinkReady] = useState(false);
 
   useEffect(() => {
     if (userData !== "") {
@@ -47,14 +48,15 @@ function HomeScreen(props) {
 
     fetchData()
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.location.href]);
 
   useEffect(() => {
 
     async function getClubNames() {
       setClubDetails([])
-      console.log("clear clubs: ", clubDetails)
-      console.log("userdata.Clubs length: ", userData.Clubs.length)
+      //console.log("clear clubs: ", clubDetails)
+      //console.log("userdata.Clubs length: ", userData.Clubs.length)
 
       for (let i = 0; i < userData.Clubs.length; i++){
         let clubID = userData.Clubs[i]
@@ -64,16 +66,20 @@ function HomeScreen(props) {
           "operation": "GetItem"
         })
         const fetchResponse = await APIService.callQuery()
-        console.log("Fetching names of current clubs: ", fetchResponse.body)
+        //console.log("Fetching names of current clubs: ", fetchResponse.body)
 
         setClubDetails(prevList => [...prevList, fetchResponse.body])
       }
     }
 
     if (userData.Clubs) getClubNames()
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData.Clubs])
 
+  const sendClubSelection = (club) => {
+    props.updateClubSelection(club);
+    setClubLinkReady(true);
+  }
 
   const acceptClubInvite = async () => {
     //call API to add user ID to the club objects membersIDs list
@@ -143,10 +149,12 @@ function HomeScreen(props) {
         {clubDetails.map((club) => (
           <li key={club.ItemID}>
             <span >{club.Username}  </span>
-            <Link to="/clubHome" onClick={() => props.updateClubSelection(club)}>    Go To!</Link>
+            <button onClick={ () => sendClubSelection(club)}>Go To!</button>
           </li>
         ))}
       </ul>
+
+      {clubLinkReady && <Link to="/clubHome">    Continue</Link>}
 
       {/* show current clubs here, need to fetch data based on the id, can use a simple key look up, need to update lambda GetItem*/}
       
