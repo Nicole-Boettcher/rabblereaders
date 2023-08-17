@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 
@@ -11,7 +11,7 @@ function HomeScreen(props) {
   useEffect(() => {
     if (userData !== "") {
       console.log("Set user data ID")
-      const data = window.localStorage.setItem('USER_ID', JSON.stringify(userData.ItemID));
+      window.localStorage.setItem('USER_ID', JSON.stringify(userData.ItemID));
     }
   }, [userData]);
   
@@ -98,7 +98,7 @@ function HomeScreen(props) {
       "operation": "UpdateItem",
       "updateExpression": "SET"
     })
-    const fetchResponse2 = await APIService2.callQuery()  //check its valid and worked
+    await APIService2.callQuery()  //check its valid and worked
 
     //remove club invite from user
     const APIService3 = new APIcalls({
@@ -108,7 +108,7 @@ function HomeScreen(props) {
       "operation": "UpdateItem",
       "updateExpression": "REMOVE"
     })
-    const fetchResponse3 = await APIService3.callQuery()  //check its valid and worked
+    await APIService3.callQuery()  //check its valid and worked
 
     console.log("gonna add club to profile")
     //add exsisting clubs to user
