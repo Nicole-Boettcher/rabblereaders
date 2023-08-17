@@ -1,13 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-//import { useState } from "react";
+import "./WelcomeScreen.css"; // Import the CSS file
 
 function WelcomeScreen(props) {
   return (
     <div className="container">
       <div className="row">
-        <Link to="/createAccount">Create New Account</Link>
-        <Link to="/login">Login</Link>
+        <Link to="/createAccount" className="link-button">
+          Create New Account
+        </Link>
+        <Link to="/login" className="link-button">
+          Login
+        </Link>
       </div>
     </div>
   );

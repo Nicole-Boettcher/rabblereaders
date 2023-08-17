@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import APIcalls from "../Utils/APIcalls";
+import './HomeScreen.css'
 
 function HomeScreen(props) {
   //when this page first loads, it should take the user data and fetch the profile from the db so it is saved
@@ -131,37 +132,50 @@ function HomeScreen(props) {
 
 
   return (
-    <div>
-      <h1 style={{ textAlign: 'center' }}>Home Screen</h1>
+    <div className="container">
+      <h1 className="heading">Home Screen</h1>
       {userData && <p>Username: {userData.Username}</p>}
-      {/* <p style={{ textAlign: 'right' }}>Password: {props.loginData.password}</p> */}
 
-      {/* <p>Current Book Clubs:</p>
-      <p>{props.clubData.name}</p> */}
+      <div className="invite-section">
+        <h3>Club Invites:</h3>
+        <p>{userData.ClubInvites}</p>
+        {userData.ClubInvites && (
+          <button className="button" onClick={acceptClubInvite}>
+            Accept Club Invite
+          </button>
+        )}
+      </div>
 
-      <h3>Club Invites:</h3>
-      <p>{userData.ClubInvites}</p>
-      {userData.ClubInvites && <button onClick={acceptClubInvite}>Accept Club Invite</button>}
+      <div>
+        <h3>Current Clubs:</h3>
+        <ul className="clubs-list">
+          {clubDetails.map((club) => (
+            <li className="club-item" key={club.ItemID}>
+              <span className="club-name">{club.Username}</span>
+              <button className="button" onClick={() => sendClubSelection(club)}>
+                Go To!
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      <h3>Current Clubs:</h3>
+      {clubLinkReady && (
+        <Link to="/clubHome" className="link-button">
+          Continue
+        </Link>
+      )}
 
-      <ul>
-        {clubDetails.map((club) => (
-          <li key={club.ItemID}>
-            <span >{club.Username}  </span>
-            <button onClick={ () => sendClubSelection(club)}>Go To!</button>
-          </li>
-        ))}
-      </ul>
-
-      {clubLinkReady && <Link to="/clubHome">    Continue</Link>}
-
-      {/* show current clubs here, need to fetch data based on the id, can use a simple key look up, need to update lambda GetItem*/}
-      
-      <p></p>
-      <Link to="/createClub">Create a New Club</Link>
+      <div>
+        <p></p>
+        <Link to="/createClub" className="link-button">
+          Create a New Club
+        </Link>
+      </div>
     </div>
   );
 }
 
 export default HomeScreen;
+
+
