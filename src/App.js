@@ -39,6 +39,7 @@ function App() {
       <div className="App">
         < div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 style={{ textAlign: 'center', margin: '0' }}>Welcome to Rabble Readers</h1>
+          <p style={{ textAlign: 'right' }}>{userData.Username}</p>
           <Link to="/" onClick={logOut} style={{ marginLeft: '10px' }}>Log out</Link>
         </div>
 

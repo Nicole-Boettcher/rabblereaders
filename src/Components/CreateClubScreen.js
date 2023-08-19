@@ -16,7 +16,7 @@ function CreateClubScreen(props) {
 
 
   useEffect(() => {
-     console.log("Get user data ID")
+     console.log("Get user data ID");
      const data = window.localStorage.getItem('USER_ID');
      setUserID(JSON.parse(data))
   }, []);

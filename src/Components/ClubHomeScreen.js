@@ -3,6 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 import './ClubHomeScreen.css'
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+
 
 function ClubHomeScreen(props) {
   //want this page to scroll fancily 
@@ -15,6 +18,15 @@ function ClubHomeScreen(props) {
   const [displaySelectAdmin, setDisplaySelectAdmin] = useState(true);
 
   const [tabSelect, setTabSelect] = useState(1);
+
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
+  const [bookGenre, setBookGenre] = useState("");
+  const [bookDescription, setBookDescription] = useState("");
+  const [meetingLocation, setMeetingLocation] = useState("");
+
+  const [date, setDate] = useState(new Date());
+
 
   useEffect(() => {
     if (clubData !== "") {
@@ -135,6 +147,31 @@ function ClubHomeScreen(props) {
     setTabSelect(tab);
   }
 
+  const createBookDetails = async () => {
+
+    const admin = JSON.parse(window.localStorage.getItem('CLUB_DATA')).CurrentAdmin;
+
+    const APIServiceClub = new APIcalls({
+      "itemType": "BookCycle",
+      "username": bookTitle,
+      "bookDetails": {
+        "bookTitle": bookTitle, 
+        "bookAuthor": bookAuthor, 
+        "bookGenre": bookGenre, 
+        "bookDescription": bookDescription
+      },
+      "admin": {
+        "name": admin.Username,
+        "id": admin.ItemID
+      },
+      "operation": "PutItem"
+    })
+    const fetchResponse = await APIServiceClub.callQuery()
+    console.log("Create new club response:")
+    console.log(fetchResponse)
+
+  }
+
   const what = () => {
     
   }
@@ -183,8 +220,76 @@ function ClubHomeScreen(props) {
       <div className={tabSelect === 2 ? "show-content" : "content"}>
         {clubData.CurrentAdmin && (
           <div>
-            {clubData.CurrentAdmin.ItemID === JSON.parse(window.localStorage.getItem('USER_ID')) && <p>Admin can only see this</p>}
+            {clubData.CurrentAdmin.ItemID === JSON.parse(window.localStorage.getItem('USER_ID')) && 
+              (<div>
+              
+                <h3 className='text-center'>Book Details</h3>
+                <div className='container'>
+                  <label htmlFor="title-field">Book Title: </label>
+                  <input
+                    id="title-field"
+                    type="text"
+                    className="form-control"
+                    value={bookTitle}
+                    onChange={(e) => setBookTitle(e.target.value)}
+                  />
+                  <label htmlFor="author-field">Author Name: </label>
+                  <input
+                    id="author-field"
+                    type="text"
+                    className="form-control"
+                    value={bookAuthor}
+                    onChange={(e) => setBookAuthor(e.target.value)}
+                  />
+                  <label htmlFor="genre-field">Book Genre: </label>
+                  <input
+                    id="genre-field"
+                    type="text"
+                    className="form-control"
+                    value={bookGenre}
+                    onChange={(e) => setBookGenre(e.target.value)}
+                  />
+                  <label htmlFor="description-field">Breif Description: </label>
+                  <input
+                    id="description-field"
+                    type="text"
+                    className="form-control"
+                    value={bookDescription}
+                    onChange={(e) => setBookDescription(e.target.value)}
+                  />
+                </div>
+
+                <div className='container'>
+                  <h3 className='text-center'>Meeting Details</h3>
+
+                  <label htmlFor="meetingLocation-field">Meeting location (members home, restaurant, library, etc.): </label>
+                  <input
+                    id="meetingLocation-field"
+                    type="text"
+                    className="form-control"
+                    value={meetingLocation}
+                    onChange={(e) => setMeetingLocation(e.target.value)}
+                  />
+
+                  <p>Please select a suggested date for the in person book discussion. The group will have a chance to review and solidify the date.</p>
+                  <div className='calendar-container'>
+                    <Calendar onChange={setDate} value={date} />
+                  </div>
+                  <p className='text-center'>
+                    <span className='bold'>Suggested date: </span>{' '}
+                    {date.toDateString()}
+
+                  </p>
+                </div>
+              
+              </div>)
+            }
             {clubData.CurrentAdmin.ItemID !== JSON.parse(window.localStorage.getItem('USER_ID')) && <p>You do not have access to this page, only current admin does</p>}
+
+            <button onClick={createBookDetails}>Confirm Book Details!</button>
+{/* 
+            should have a current book cycle own object, and then inside the club the id of the current book cycle 
+            also inside the club, it should hold a list of previous book cycles and thats what will populate the history page  */}
           </div>
         )}
       </div>
