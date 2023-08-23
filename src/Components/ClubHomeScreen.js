@@ -5,6 +5,7 @@ import APIcalls from "../Utils/APIcalls";
 import './ClubHomeScreen.css'
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import TextThread from "./TextThread";
 
 
 function ClubHomeScreen(props) {
@@ -14,6 +15,7 @@ function ClubHomeScreen(props) {
 
   const [clubData, setClubData] = useState("");
   const [bookCycleData, setBookCycleData] = useState("");
+  const [textThreadData, setTextThreadData] = useState("")
   const [membersData, setMembersData] = useState([]);
   const [selectedValue, setSelectedValue] = useState('');
   const [displaySelectAdmin, setDisplaySelectAdmin] = useState(true);
@@ -41,6 +43,11 @@ function ClubHomeScreen(props) {
       window.localStorage.setItem('BOOK_CYCLE_DATA', JSON.stringify(bookCycleData));
       console.log(bookCycleData)
     }
+    if (textThreadData !== "") {
+      console.log("Setting text thread data")
+      window.localStorage.setItem('TEXT_THREAD_DATA', JSON.stringify(textThreadData));
+      console.log(textThreadData)
+    }
     if (membersData && membersData.length !== 0) {
       console.log("Setting member data: ", membersData)
       let ids = []
@@ -52,7 +59,7 @@ function ClubHomeScreen(props) {
       window.localStorage.setItem('MEMBERS_DATA', JSON.stringify(membersData));
     }
     
-  }, [clubData, membersData, bookCycleData]);
+  }, [clubData, membersData, bookCycleData, textThreadData]);
   
 
   useEffect(() => {
@@ -152,7 +159,38 @@ function ClubHomeScreen(props) {
       setBookCycleData(fetchResponse.body[0])
     }
   }
-  
+
+  useEffect(() => {
+
+    const fetchTextThread = async () => {
+      let id = bookCycleData.ItemID
+
+      if (id === undefined) {
+        //need to get ID from local storage 
+        console.log("text thread ID problem")
+
+      } else {
+        const APIService = new APIcalls({
+          "itemType": "TextThread",
+          "parentClubID": id,
+          "operation": "Query"
+        })
+    
+        const fetchResponse = await APIService.callQuery();
+        console.log("Query response for text thread based on book cycle id:");
+        console.log(fetchResponse);
+    
+        if (fetchResponse.body.length === 0) {
+          console.log("No text thread found, not created yet");
+        } else {
+          setTextThreadData(fetchResponse.body[0])
+        }
+      }
+    }
+
+    fetchTextThread()
+
+  }, [bookCycleData])
 
   const handleDropdownChange = (event) => {
     setSelectedValue(event.target.value);
@@ -221,6 +259,17 @@ function ClubHomeScreen(props) {
     console.log("Create new club response:")
     console.log(fetchResponse)
 
+    const APIServiceClub2 = new APIcalls({
+      "itemType": "TextThread",
+      "username": bookTitle,
+      "parentClubID": fetchResponse.id,
+      "operation": "PutItem"
+    })
+    const fetchResponse2 = await APIServiceClub2.callQuery()
+    console.log("Create new text thread response:")
+    console.log(fetchResponse2)
+
+
     setDisplayConfirmSelection(true);
     fetchBookCycleData();
   }
@@ -231,65 +280,98 @@ function ClubHomeScreen(props) {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ margin: '0' }}>{clubData.Username}</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1 style={{ margin: "0" }}>{clubData.Username}</h1>
         <ul className="tabs-container">
-          <li className="tabs" onClick={() => updateTabSelect(1)}>Home</li>
-          <li className="tabs" onClick={() => updateTabSelect(2)}>Book Selection</li>
-          <li className="tabs" onClick={() => updateTabSelect(3)}>History</li>
-          <li className="tabs" onClick={() => updateTabSelect(4)}>Members</li>
+          <li className="tabs" onClick={() => updateTabSelect(1)}>
+            Home
+          </li>
+          <li className="tabs" onClick={() => updateTabSelect(2)}>
+            Book Selection
+          </li>
+          <li className="tabs" onClick={() => updateTabSelect(3)}>
+            History
+          </li>
+          <li className="tabs" onClick={() => updateTabSelect(4)}>
+            Members
+          </li>
         </ul>
       </div>
- 
+
       <p></p>
 
       <div className={tabSelect === 1 ? "show-content" : "content"}>
-
-
         {/* should first check if club has an admin first */}
         {!clubData.CurrentAdmin && displaySelectAdmin && (
-        <div>
-          <h3>Select an Admin for this Book Cycle:</h3>
-          <select value={selectedValue} onChange={handleDropdownChange}>
-            <option value="">Select an option</option>
-            {membersData.map((member) => (
-              <option key={member.ItemID} value={member.ItemID}>
-                {member.Username}
-              </option>
-            ))}
-          </select>
-          {selectedValue && (<button onClick={ () => selectAdmin(selectedValue)}>Confirm {selectedValue.Username} as Admin</button>)}
-        </div>
+          <div>
+            <h3>Select an Admin for this Book Cycle:</h3>
+            <select value={selectedValue} onChange={handleDropdownChange}>
+              <option value="">Select an option</option>
+              {membersData.map((member) => (
+                <option key={member.ItemID} value={member.ItemID}>
+                  {member.Username}
+                </option>
+              ))}
+            </select>
+            {selectedValue && (
+              <button onClick={() => selectAdmin(selectedValue)}>
+                Confirm {selectedValue.Username} as Admin
+              </button>
+            )}
+          </div>
         )}
 
-        {clubData.CurrentAdmin && <p>This cycles admin is: {clubData.CurrentAdmin.Username}</p>}
+        {clubData.CurrentAdmin && (
+          <p>This cycles admin is: {clubData.CurrentAdmin.Username}</p>
+        )}
 
         <div>
-          <p>Book Details</p>
           {bookCycleData && (
             <div>
+              <h3>Book Details</h3>
               <p>Book Name: {bookCycleData.BookDetails.bookTitle}</p>
               <p>Book Author: {bookCycleData.BookDetails.bookAuthor}</p>
               <p>Book Genre: {bookCycleData.BookDetails.bookGenre}</p>
-              <p>Book Description: {bookCycleData.BookDetails.bookDescription}</p>
-            </div>  
+              <p>
+                Book Description: {bookCycleData.BookDetails.bookDescription}
+              </p>
+
+              <h3>Meeting Details</h3>
+              <p>
+                Suggested Meeting Date:{" "}
+                {bookCycleData.MeetingDetails.meetingDate}
+              </p>
+              <p>
+                Suggested Meeting Time:{" "}
+                {bookCycleData.MeetingDetails.meetingTime}
+              </p>
+              <p>
+                Suggesting Meeting Location:{" "}
+                {bookCycleData.MeetingDetails.meetingLocation}
+              </p>
+
+              <TextThread membersData={membersData} textThreadData={textThreadData}></TextThread>
+            </div>
           )}
         </div>
-
-
       </div>
       {/* if you are the admin you should pick the book and its details  */}
       {/* One tab should be named Book Selection and to fill out the form you must be the current admin  */}
 
-
       <div className={tabSelect === 2 ? "show-content" : "content"}>
         {clubData.CurrentAdmin && !displayConfirmSelection && (
           <div>
-            {clubData.CurrentAdmin.ItemID === JSON.parse(window.localStorage.getItem('USER_ID')) && 
-              (<div>
-              
-                <h3 className='text-center'>Book Details</h3>
-                <div className='container'>
+            {clubData.CurrentAdmin.ItemID ===
+              JSON.parse(window.localStorage.getItem("USER_ID")) && (
+              <div>
+                <h3 className="text-center">Book Details</h3>
+                <div className="container">
                   <label htmlFor="title-field">Book Title: </label>
                   <input
                     id="title-field"
@@ -324,10 +406,13 @@ function ClubHomeScreen(props) {
                   />
                 </div>
 
-                <div className='container'>
-                  <h3 className='text-center'>Meeting Details</h3>
+                <div className="container">
+                  <h3 className="text-center">Meeting Details</h3>
 
-                  <label htmlFor="meetingLocation-field">Meeting location/Address (members home, restaurant, library, etc.): </label>
+                  <label htmlFor="meetingLocation-field">
+                    Meeting location/Address (members home, restaurant, library,
+                    etc.):{" "}
+                  </label>
                   <input
                     id="meetingLocation-field"
                     type="text"
@@ -335,19 +420,23 @@ function ClubHomeScreen(props) {
                     value={meetingLocation}
                     onChange={(e) => setMeetingLocation(e.target.value)}
                   />
-                  
 
-                  <p>Please select a suggested date on the calander for the in person book discussion. The group will have a chance to review and solidify the date.</p>
-                  <div className='calendar-container'>
+                  <p>
+                    Please select a suggested date on the calander for the in
+                    person book discussion. The group will have a chance to
+                    review and solidify the date.
+                  </p>
+                  <div className="calendar-container">
                     <Calendar onChange={setMeetingDate} value={meetingDate} />
                   </div>
-                  <p className='text-center'>
-                    <span className='bold'>Suggested date: </span>{' '}
+                  <p className="text-center">
+                    <span className="bold">Suggested date: </span>{" "}
                     {meetingDate.toDateString()}
-
                   </p>
 
-                  <label htmlFor="meetingTime-field">Meeting time - include AM vs PM: </label>
+                  <label htmlFor="meetingTime-field">
+                    Meeting time - include AM vs PM:{" "}
+                  </label>
                   <input
                     id="meetingTime-field"
                     type="text"
@@ -355,16 +444,20 @@ function ClubHomeScreen(props) {
                     value={meetingTime}
                     onChange={(e) => setMeetingTime(e.target.value)}
                   />
-
                 </div>
-              
-                <button onClick={createBookDetails}>Confirm Book Details!</button>
 
-              </div>)
-            }
-            {clubData.CurrentAdmin.ItemID !== JSON.parse(window.localStorage.getItem('USER_ID')) && <p>You do not have access to this page, only current admin does</p>}
+                <button onClick={createBookDetails}>
+                  Confirm Book Details!
+                </button>
+              </div>
+            )}
+            {clubData.CurrentAdmin.ItemID !==
+              JSON.parse(window.localStorage.getItem("USER_ID")) && (
+              <p>
+                You do not have access to this page, only current admin does
+              </p>
+            )}
 
-            
             {/* 
             should have a current book cycle own object, and then inside the club the id of the current book cycle 
             also inside the club, it should hold a list of previous book cycles and thats what will populate the history page  */}
@@ -373,7 +466,10 @@ function ClubHomeScreen(props) {
 
         {clubData.CurrentAdmin && displayConfirmSelection && (
           <div>
-            <p>Book Selection Complete! Now all members will be able to see {bookTitle} details on the 'Home' tab</p>
+            <p>
+              Book Selection Complete! Now all members will be able to see{" "}
+              {bookTitle} details on the 'Home' tab
+            </p>
             {/* Should add edit option here */}
           </div>
         )}
@@ -384,7 +480,14 @@ function ClubHomeScreen(props) {
       </div>
 
       <div className={tabSelect === 4 ? "show-content" : "content"}>
-        <p>Members</p>
+        <p>Members:</p>
+        {membersData.length > 0 && (
+          <ul>
+            {membersData.map((contact) => (
+              <li key={contact.ItemID}>{contact.Username}</li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
