@@ -34,6 +34,7 @@ function App() {
     window.localStorage.removeItem('MEMBERS_ID')
     window.localStorage.removeItem('BOOK_CYCLE_ID')
     window.localStorage.removeItem('BOOK_CYCLE_DATA')
+    window.localStorage.removeItem('TEXT_THREAD_DATA')
   }
 
   return (
@@ -73,7 +74,7 @@ function App() {
           />
           <Route
             path="/clubHome"
-            element={<ClubHomeScreen clubSelection={clubSelection}/>}
+            element={<ClubHomeScreen userData={userData} clubSelection={clubSelection}/>}
           />
 
         </Routes>

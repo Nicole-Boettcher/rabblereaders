@@ -12,7 +12,7 @@ function ClubHomeScreen(props) {
   //want this page to scroll fancily 
 
   //1. Fetch all data about club and store it locally 
-
+  const [userData, setUserData] = useState(""); 
   const [clubData, setClubData] = useState("");
   const [bookCycleData, setBookCycleData] = useState("");
   const [textThreadData, setTextThreadData] = useState("")
@@ -31,6 +31,14 @@ function ClubHomeScreen(props) {
   const [meetingDate, setMeetingDate] = useState(new Date());
   const [displayConfirmSelection, setDisplayConfirmSelection] = useState(false);
 
+
+  useEffect(() => {
+    if (userData !== "") {
+      console.log("Set user data ID")
+      window.localStorage.setItem('USER_ID', JSON.stringify(userData.ItemID));
+      window.localStorage.setItem('USER_DATA', JSON.stringify(userData));
+    }
+  }, [userData]);
 
   useEffect(() => {
     if (clubData !== "") {
@@ -63,6 +71,34 @@ function ClubHomeScreen(props) {
   
 
   useEffect(() => {
+
+    async function fetchUserData() {
+      console.log("Call API to get userInfo: ", props.userData.ItemID)
+    
+      let id = props.userData.ItemID
+
+      if (id === undefined) {
+        //need to get ID from local storage 
+        console.log("grabbing id from local storage")
+        const data = window.localStorage.getItem('USER_ID')
+        id = JSON.parse(data)
+      }
+
+      const APIService = new APIcalls({
+        "itemID": id,
+        "itemType": "User",
+        "operation": "GetItem"
+      })
+      const fetchResponse = await APIService.callQuery()
+      console.log("Get updated User now:")
+      console.log(fetchResponse)
+      if (fetchResponse.statusCode === 200) {
+         setUserData(fetchResponse.body)
+      } else {
+        console.log("ERROR, could not find User by ID")
+      }
+    }
+
 
     async function fetchClubData() {
 
@@ -122,8 +158,9 @@ function ClubHomeScreen(props) {
       }
     }
 
+    fetchUserData()
     fetchClubData()
-    fetchBookCycleData() //ERROR WHEN CALLED WHEN CLUB LOADS, QUERY IS READING WRONG TYPE??
+    fetchBookCycleData() 
     fetchMemberData()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -356,7 +393,7 @@ function ClubHomeScreen(props) {
                 {bookCycleData.MeetingDetails.meetingLocation}
               </p>
 
-              <TextThread membersData={membersData} textThreadData={textThreadData}></TextThread>
+              <TextThread userData={userData} membersData={membersData} textThreadData={textThreadData}></TextThread>
             </div>
           )}
         </div>

@@ -1,29 +1,38 @@
 import React, { useState, useEffect } from "react"
+import APIcalls from "../Utils/APIcalls";
+import './TextThread.css'
 
 function TextThread(props) {
+    const [userData, setUserData] = useState("")
     const [contacts, setContacts] = useState([]); // Initialize state with an empty array
     const [textThread, setTextThread] = useState({})
     const [message, setMessage] = useState("");
 
     useEffect(() => {
-        // Update contacts state when props.membersData changes
         setContacts(props.membersData);
         setTextThread(props.textThreadData)
-    }, [props.membersData, props.textThreadData]); // Run the effect whenever membersData changes
+        setUserData(props.userData)
+    }, [props.membersData, props.textThreadData, props.userData]); // Run the effect whenever membersData changes
 
     const sendMessage = async () => {
-        //take message and add it to the text thread 
-        // const APIService = new APIcalls({
-        //     "itemID": clubData.ItemID,
-        //     "itemType": "Club",
-        //     "operation": "UpdateItem",
-        //     "updateExpression": "SET",
-        //     "currentAdmin": admin
-        // })
+
+        console.log("before adding this text, current textThread: ", textThread)
+        // take message and add it to the text thread 
+        const APIService = new APIcalls({
+            "itemID": textThread.ItemID,
+            "itemType": "TextThread",
+            "message": {
+                "messageContent": message,
+                "user": userData.Username
+            },
+            "operation": "UpdateItem",
+            "updateExpression": "SET"
+        })
       
-        // const fetchResponse = await APIService.callQuery()
-        // console.log(fetchResponse)
-        
+        const fetchResponse = await APIService.callQuery()
+        console.log("update the messages to include to new one: ", fetchResponse)
+        setTextThread(fetchResponse.body.Attributes)
+        setMessage("")
     }
 
 
@@ -40,11 +49,28 @@ function TextThread(props) {
 
         {/* it should display all previous texts and have the enter box at the bottom  */}
 
-        {textThread && (
+        {/* {textThread && userData && (
             <div>
+                <p>{userData.Username}</p>
                 <p>{textThread.ItemID}</p>
             </div>
+        )} */}
+
+        {/* want it to render the exsisting message before the input box and in the order they were sent  */}
+
+        {textThread.Messages && textThread.Messages.length > 0 && (
+          <ul className="message-list">
+            {textThread.Messages.map((text) => (
+              <li
+                key={text.timeStamp}
+                className={`text-bubble ${text.messageDetails.user === userData.Username ? 'sender' : 'receiver'}`}
+                >
+                {text.messageDetails.user}: {text.messageDetails.messageContent}
+              </li>
+            ))}
+          </ul>
         )}
+
         <input
           id="text-field"
           type="text"

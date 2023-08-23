@@ -1,0 +1,24 @@
+/* Style for the text bubble container */
+.text-bubble {
+    display: inline-block;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    max-width: 70%;
+    clear: both;
+  }
+  
+  /* Style for sender's messages */
+  .sender {
+    background-color: peru;
+    color: white;
+    float: right;
+  }
+  
+  /* Style for receiver's messages */
+  .receiver {
+    background-color: lightblue;
+    color: black;
+    float: left;
+  }
+  
