@@ -1,5 +1,4 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 import './ClubHomeScreen.css'
@@ -237,7 +236,7 @@ function ClubHomeScreen(props) {
     console.log(adminID)
     let admin = ""
     membersData.forEach((member) => {
-      if (member.ItemID == adminID){
+      if (member.ItemID === adminID){
         admin = member
       }
     })
@@ -254,7 +253,7 @@ function ClubHomeScreen(props) {
     const fetchResponse = await APIService.callQuery()
     console.log(fetchResponse)
 
-    if (fetchResponse.statusCode != 200){
+    if (fetchResponse.statusCode !== 200){
       console.error("ERROR setting club invite")
     }
 
@@ -309,10 +308,6 @@ function ClubHomeScreen(props) {
 
     setDisplayConfirmSelection(true);
     fetchBookCycleData();
-  }
-
-  const what = () => {
-    
   }
 
   return (
@@ -517,7 +512,7 @@ function ClubHomeScreen(props) {
       </div>
 
       <div className={tabSelect === 4 ? "show-content" : "content"}>
-        <p>Members:</p>
+        <p>Order of Admins:</p>
         {membersData.length > 0 && (
           <ul>
             {membersData.map((contact) => (

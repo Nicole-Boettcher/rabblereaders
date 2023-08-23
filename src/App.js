@@ -28,6 +28,7 @@ function App() {
   const logOut = () => {
     setUserData({})
     window.localStorage.removeItem('USER_ID')
+    window.localStorage.removeItem('USER_DATA')
     window.localStorage.removeItem('CLUB_ID')
     window.localStorage.removeItem('CLUB_DATA')
     window.localStorage.removeItem('MEMBERS_DATA')

@@ -45,7 +45,7 @@ function CreateClubScreen(props) {
         console.log("Search response:")
         console.log(fetchResponse)
 
-        if (fetchResponse.statusCode != 200){
+        if (fetchResponse.statusCode !== 200){
           console.error("ERROR setting club invite")
         }
       }
@@ -82,7 +82,7 @@ function CreateClubScreen(props) {
         "updateExpression": "SET"
       })
       const fetchResponse3 = await APIService3.callQuery()  //check its valid and worked
-
+      console.log("Add club to user profile: ", fetchResponse3)
       setErrorMessage(false)
       setCreateClubSuccess(true)
     }

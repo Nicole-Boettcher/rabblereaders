@@ -38,14 +38,14 @@ function TextThread(props) {
 
     return (
       <div className="container">
-        <p>Please discuss any meeting conflicts in chat form before</p>
-        {/* {contacts.length > 0 && (
-                <ul>
-                    {contacts.map((contact) => (
-                        <li key={contact.ItemID}>{contact.Username}</li>
-                    ))}
-                </ul>
-            )} */}
+        <p>Please discuss any meeting conflicts in chat below with:</p>
+        {contacts.length > 0 && (
+          <ul>
+            {contacts.map((contact) => (
+              <li key={contact.ItemID}>{contact.Username}</li>
+            ))}
+          </ul>
+        )}
 
         {/* it should display all previous texts and have the enter box at the bottom  */}
 
@@ -63,8 +63,12 @@ function TextThread(props) {
             {textThread.Messages.map((text) => (
               <li
                 key={text.timeStamp}
-                className={`text-bubble ${text.messageDetails.user === userData.Username ? 'sender' : 'receiver'}`}
-                >
+                className={`text-bubble ${
+                  text.messageDetails.user === userData.Username
+                    ? "sender"
+                    : "receiver"
+                }`}
+              >
                 {text.messageDetails.user}: {text.messageDetails.messageContent}
               </li>
             ))}
