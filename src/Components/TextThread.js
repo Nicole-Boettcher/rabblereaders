@@ -4,12 +4,11 @@ import './TextThread.css'
 
 function TextThread(props) {
     const [userData, setUserData] = useState("")
-    const [contacts, setContacts] = useState([]); // Initialize state with an empty array
     const [textThread, setTextThread] = useState({})
     const [message, setMessage] = useState("");
+    const [ableToSend, setAbleToSend] = useState(false);
 
     useEffect(() => {
-        setContacts(props.membersData);
         setTextThread(props.textThreadData)
         setUserData(props.userData)
     }, [props.membersData, props.textThreadData, props.userData]); // Run the effect whenever membersData changes
@@ -33,19 +32,30 @@ function TextThread(props) {
         console.log("update the messages to include to new one: ", fetchResponse)
         setTextThread(fetchResponse.body.Attributes)
         setMessage("")
+        setAbleToSend(false)
+    }
+
+    const refreshChat = async () => {
+
+        console.log("before sending text, refresh chat")
+        // take message and add it to the text thread 
+        const APIService = new APIcalls({
+            "itemID": textThread.ItemID,
+            "itemType": "TextThread",
+            "operation": "GetItem"
+        })
+      
+        const fetchResponse = await APIService.callQuery()
+        console.log("update chat: ", fetchResponse)
+        setTextThread(fetchResponse.body)
+        setAbleToSend(true)
     }
 
 
     return (
       <div className="container">
         <p>Please discuss any meeting conflicts in chat below with:</p>
-        {contacts.length > 0 && (
-          <ul>
-            {contacts.map((contact) => (
-              <li key={contact.ItemID}>{contact.Username}</li>
-            ))}
-          </ul>
-        )}
+
 
         {/* it should display all previous texts and have the enter box at the bottom  */}
 
@@ -82,7 +92,14 @@ function TextThread(props) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button onClick={sendMessage}>Send</button>
+
+        <button onClick={refreshChat}>Refresh Chat to Send</button>
+
+        {ableToSend && (
+          <div>
+            <button onClick={sendMessage}>Send</button>
+          </div>
+        )}
       </div>
     );
 }

@@ -397,7 +397,8 @@ function ClubHomeScreen(props) {
       {/* One tab should be named Book Selection and to fill out the form you must be the current admin  */}
 
       <div className={tabSelect === 2 ? "show-content" : "content"}>
-        {clubData.CurrentAdmin && !displayConfirmSelection && (
+
+        {clubData.CurrentAdmin && !displayConfirmSelection && bookCycleData === "" && (
           <div>
             {clubData.CurrentAdmin.ItemID ===
               JSON.parse(window.localStorage.getItem("USER_ID")) && (
@@ -496,7 +497,7 @@ function ClubHomeScreen(props) {
           </div>
         )}
 
-        {clubData.CurrentAdmin && displayConfirmSelection && (
+        {(bookCycleData || (clubData.CurrentAdmin && displayConfirmSelection)) && (
           <div>
             <p>
               Book Selection Complete! Now all members will be able to see{" "}
