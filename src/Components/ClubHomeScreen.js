@@ -376,8 +376,16 @@ function ClubHomeScreen(props) {
 
               <h3>Meeting Details</h3>
               <p>
-                Suggested Meeting Date:{" "}
-                {bookCycleData.MeetingDetails.meetingDate}
+
+                <p className="text-center">
+                  <span className="bold">Suggested Meeting Date: </span>{" "}
+                  {bookCycleData.MeetingDetails.meetingDate}
+                </p>
+
+                <div className="calendar-container">
+                  <Calendar value={bookCycleData.MeetingDetails.meetingDate} />
+                </div>
+                
               </p>
               <p>
                 Suggested Meeting Time:{" "}
@@ -388,116 +396,126 @@ function ClubHomeScreen(props) {
                 {bookCycleData.MeetingDetails.meetingLocation}
               </p>
 
-              <TextThread userData={userData} membersData={membersData} textThreadData={textThreadData}></TextThread>
+              <TextThread
+                userData={userData}
+                membersData={membersData}
+                textThreadData={textThreadData}
+              ></TextThread>
             </div>
           )}
         </div>
+
+
       </div>
       {/* if you are the admin you should pick the book and its details  */}
       {/* One tab should be named Book Selection and to fill out the form you must be the current admin  */}
 
       <div className={tabSelect === 2 ? "show-content" : "content"}>
-
-        {clubData.CurrentAdmin && !displayConfirmSelection && bookCycleData === "" && (
-          <div>
-            {clubData.CurrentAdmin.ItemID ===
-              JSON.parse(window.localStorage.getItem("USER_ID")) && (
-              <div>
-                <h3 className="text-center">Book Details</h3>
-                <div className="container">
-                  <label htmlFor="title-field">Book Title: </label>
-                  <input
-                    id="title-field"
-                    type="text"
-                    className="form-control"
-                    value={bookTitle}
-                    onChange={(e) => setBookTitle(e.target.value)}
-                  />
-                  <label htmlFor="author-field">Author Name: </label>
-                  <input
-                    id="author-field"
-                    type="text"
-                    className="form-control"
-                    value={bookAuthor}
-                    onChange={(e) => setBookAuthor(e.target.value)}
-                  />
-                  <label htmlFor="genre-field">Book Genre: </label>
-                  <input
-                    id="genre-field"
-                    type="text"
-                    className="form-control"
-                    value={bookGenre}
-                    onChange={(e) => setBookGenre(e.target.value)}
-                  />
-                  <label htmlFor="description-field">Breif Description: </label>
-                  <input
-                    id="description-field"
-                    type="text"
-                    className="form-control"
-                    value={bookDescription}
-                    onChange={(e) => setBookDescription(e.target.value)}
-                  />
-                </div>
-
-                <div className="container">
-                  <h3 className="text-center">Meeting Details</h3>
-
-                  <label htmlFor="meetingLocation-field">
-                    Meeting location/Address (members home, restaurant, library,
-                    etc.):{" "}
-                  </label>
-                  <input
-                    id="meetingLocation-field"
-                    type="text"
-                    className="form-control"
-                    value={meetingLocation}
-                    onChange={(e) => setMeetingLocation(e.target.value)}
-                  />
-
-                  <p>
-                    Please select a suggested date on the calander for the in
-                    person book discussion. The group will have a chance to
-                    review and solidify the date.
-                  </p>
-                  <div className="calendar-container">
-                    <Calendar onChange={setMeetingDate} value={meetingDate} />
+        {clubData.CurrentAdmin &&
+          !displayConfirmSelection &&
+          bookCycleData === "" && (
+            <div>
+              {clubData.CurrentAdmin.ItemID ===
+                JSON.parse(window.localStorage.getItem("USER_ID")) && (
+                <div>
+                  <h3 className="text-center">Book Details</h3>
+                  <div className="container">
+                    <label htmlFor="title-field">Book Title: </label>
+                    <input
+                      id="title-field"
+                      type="text"
+                      className="form-control"
+                      value={bookTitle}
+                      onChange={(e) => setBookTitle(e.target.value)}
+                    />
+                    <label htmlFor="author-field">Author Name: </label>
+                    <input
+                      id="author-field"
+                      type="text"
+                      className="form-control"
+                      value={bookAuthor}
+                      onChange={(e) => setBookAuthor(e.target.value)}
+                    />
+                    <label htmlFor="genre-field">Book Genre: </label>
+                    <input
+                      id="genre-field"
+                      type="text"
+                      className="form-control"
+                      value={bookGenre}
+                      onChange={(e) => setBookGenre(e.target.value)}
+                    />
+                    <label htmlFor="description-field">
+                      Breif Description:{" "}
+                    </label>
+                    <input
+                      id="description-field"
+                      type="text"
+                      className="form-control"
+                      value={bookDescription}
+                      onChange={(e) => setBookDescription(e.target.value)}
+                    />
                   </div>
-                  <p className="text-center">
-                    <span className="bold">Suggested date: </span>{" "}
-                    {meetingDate.toDateString()}
-                  </p>
 
-                  <label htmlFor="meetingTime-field">
-                    Meeting time - include AM vs PM:{" "}
-                  </label>
-                  <input
-                    id="meetingTime-field"
-                    type="text"
-                    className="form-control"
-                    value={meetingTime}
-                    onChange={(e) => setMeetingTime(e.target.value)}
-                  />
+                  <div className="container">
+                    <h3 className="text-center">Meeting Details</h3>
+
+                    <label htmlFor="meetingLocation-field">
+                      Meeting location/Address (members home, restaurant,
+                      library, etc.):{" "}
+                    </label>
+                    <input
+                      id="meetingLocation-field"
+                      type="text"
+                      className="form-control"
+                      value={meetingLocation}
+                      onChange={(e) => setMeetingLocation(e.target.value)}
+                    />
+
+                    <p>
+                      Please select a suggested date on the calander for the in
+                      person book discussion. The group will have a chance to
+                      review and solidify the date.
+                    </p>
+                    <div className="calendar-container">
+                      <Calendar onChange={setMeetingDate} value={meetingDate} />
+                    </div>
+                    <p className="text-center">
+                      <span className="bold">Suggested date: </span>{" "}
+                      {meetingDate.toDateString()}
+                    </p>
+
+                    <label htmlFor="meetingTime-field">
+                      Meeting time - include AM vs PM:{" "}
+                    </label>
+                    <input
+                      id="meetingTime-field"
+                      type="text"
+                      className="form-control"
+                      value={meetingTime}
+                      onChange={(e) => setMeetingTime(e.target.value)}
+                    />
+                  </div>
+
+                  <button onClick={createBookDetails}>
+                    Confirm Book Details!
+                  </button>
                 </div>
+              )}
+              {clubData.CurrentAdmin.ItemID !==
+                JSON.parse(window.localStorage.getItem("USER_ID")) && (
+                <p>
+                  You do not have access to this page, only current admin does
+                </p>
+              )}
 
-                <button onClick={createBookDetails}>
-                  Confirm Book Details!
-                </button>
-              </div>
-            )}
-            {clubData.CurrentAdmin.ItemID !==
-              JSON.parse(window.localStorage.getItem("USER_ID")) && (
-              <p>
-                You do not have access to this page, only current admin does
-              </p>
-            )}
-
-            {/* 
+              {/* 
             should have a current book cycle own object, and then inside the club the id of the current book cycle 
             also inside the club, it should hold a list of previous book cycles and thats what will populate the history page  */}
-          </div>
-        )}
+            </div>
+          )}
 
-        {(bookCycleData || (clubData.CurrentAdmin && displayConfirmSelection)) && (
+        {(bookCycleData ||
+          (clubData.CurrentAdmin && displayConfirmSelection)) && (
           <div>
             <p>
               Book Selection Complete! Now all members will be able to see{" "}
