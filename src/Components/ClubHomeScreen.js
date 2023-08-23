@@ -13,6 +13,7 @@ function ClubHomeScreen(props) {
   //1. Fetch all data about club and store it locally 
 
   const [clubData, setClubData] = useState("");
+  const [bookCycleData, setBookCycleData] = useState("");
   const [membersData, setMembersData] = useState([]);
   const [selectedValue, setSelectedValue] = useState('');
   const [displaySelectAdmin, setDisplaySelectAdmin] = useState(true);
@@ -24,8 +25,9 @@ function ClubHomeScreen(props) {
   const [bookGenre, setBookGenre] = useState("");
   const [bookDescription, setBookDescription] = useState("");
   const [meetingLocation, setMeetingLocation] = useState("");
-
-  const [date, setDate] = useState(new Date());
+  const [meetingTime, setMeetingTime] = useState("");
+  const [meetingDate, setMeetingDate] = useState(new Date());
+  const [displayConfirmSelection, setDisplayConfirmSelection] = useState(false);
 
 
   useEffect(() => {
@@ -33,6 +35,11 @@ function ClubHomeScreen(props) {
       console.log("Setting club data")
       window.localStorage.setItem('CLUB_ID', JSON.stringify(clubData.ItemID));
       window.localStorage.setItem('CLUB_DATA', JSON.stringify(clubData));
+    }
+    if (bookCycleData !== "") {
+      console.log("Setting book cycle data")
+      window.localStorage.setItem('BOOK_CYCLE_DATA', JSON.stringify(bookCycleData));
+      console.log(bookCycleData)
     }
     if (membersData && membersData.length !== 0) {
       console.log("Setting member data: ", membersData)
@@ -44,14 +51,14 @@ function ClubHomeScreen(props) {
       window.localStorage.setItem('MEMBERS_ID', JSON.stringify(ids))
       window.localStorage.setItem('MEMBERS_DATA', JSON.stringify(membersData));
     }
-  }, [clubData, membersData]);
+    
+  }, [clubData, membersData, bookCycleData]);
   
 
   useEffect(() => {
 
     async function fetchClubData() {
-      console.log("Call API to get club Info: ", props.clubSelection.ItemID)
-    
+
       let id = props.clubSelection.ItemID
 
       if (id === undefined) {
@@ -60,6 +67,9 @@ function ClubHomeScreen(props) {
         const data = window.localStorage.getItem('CLUB_ID')
         id = JSON.parse(data)
       }
+
+
+      console.log("Call API to get club Info: ", props.clubSelection.ItemID)
 
       const APIService = new APIcalls({
         "itemID": id,
@@ -106,10 +116,43 @@ function ClubHomeScreen(props) {
     }
 
     fetchClubData()
+    fetchBookCycleData() //ERROR WHEN CALLED WHEN CLUB LOADS, QUERY IS READING WRONG TYPE??
     fetchMemberData()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.location.href, displaySelectAdmin]);
+
+
+  const fetchBookCycleData = async () => {
+
+    let id = props.clubSelection.ItemID
+    console.log("helllllo")
+
+    if (id === undefined) {
+      //need to get ID from local storage 
+      console.log("grabbing id from local storage")
+      const data = window.localStorage.getItem('CLUB_ID')
+      id = JSON.parse(data)
+      console.log("id: ", id)
+    }
+
+    const APIService = new APIcalls({
+      "itemType": "BookCycle",
+      "parentClubID": id,
+      "operation": "Query"
+    })
+
+    const fetchResponse = await APIService.callQuery();
+    console.log("Query response for book cycle based on club id:");
+    console.log(fetchResponse);
+
+    if (fetchResponse.body.length === 0) {
+      console.log("No book cycle found, not created yet");
+    } else {
+      setBookCycleData(fetchResponse.body[0])
+    }
+  }
+  
 
   const handleDropdownChange = (event) => {
     setSelectedValue(event.target.value);
@@ -150,15 +193,23 @@ function ClubHomeScreen(props) {
   const createBookDetails = async () => {
 
     const admin = JSON.parse(window.localStorage.getItem('CLUB_DATA')).CurrentAdmin;
+    const parentClubID = JSON.parse(window.localStorage.getItem('CLUB_ID'));
+
 
     const APIServiceClub = new APIcalls({
       "itemType": "BookCycle",
       "username": bookTitle,
+      "parentClubID": parentClubID,
       "bookDetails": {
         "bookTitle": bookTitle, 
         "bookAuthor": bookAuthor, 
         "bookGenre": bookGenre, 
         "bookDescription": bookDescription
+      },
+      "meetingDetails": {
+        "meetingLocation": meetingLocation, 
+        "meetingDate": meetingDate, 
+        "meetingTime": meetingTime
       },
       "admin": {
         "name": admin.Username,
@@ -170,6 +221,8 @@ function ClubHomeScreen(props) {
     console.log("Create new club response:")
     console.log(fetchResponse)
 
+    setDisplayConfirmSelection(true);
+    fetchBookCycleData();
   }
 
   const what = () => {
@@ -211,6 +264,18 @@ function ClubHomeScreen(props) {
 
         {clubData.CurrentAdmin && <p>This cycles admin is: {clubData.CurrentAdmin.Username}</p>}
 
+        <div>
+          <p>Book Details</p>
+          {bookCycleData && (
+            <div>
+              <p>Book Name: {bookCycleData.BookDetails.bookTitle}</p>
+              <p>Book Author: {bookCycleData.BookDetails.bookAuthor}</p>
+              <p>Book Genre: {bookCycleData.BookDetails.bookGenre}</p>
+              <p>Book Description: {bookCycleData.BookDetails.bookDescription}</p>
+            </div>  
+          )}
+        </div>
+
 
       </div>
       {/* if you are the admin you should pick the book and its details  */}
@@ -218,7 +283,7 @@ function ClubHomeScreen(props) {
 
 
       <div className={tabSelect === 2 ? "show-content" : "content"}>
-        {clubData.CurrentAdmin && (
+        {clubData.CurrentAdmin && !displayConfirmSelection && (
           <div>
             {clubData.CurrentAdmin.ItemID === JSON.parse(window.localStorage.getItem('USER_ID')) && 
               (<div>
@@ -262,7 +327,7 @@ function ClubHomeScreen(props) {
                 <div className='container'>
                   <h3 className='text-center'>Meeting Details</h3>
 
-                  <label htmlFor="meetingLocation-field">Meeting location (members home, restaurant, library, etc.): </label>
+                  <label htmlFor="meetingLocation-field">Meeting location/Address (members home, restaurant, library, etc.): </label>
                   <input
                     id="meetingLocation-field"
                     type="text"
@@ -270,36 +335,56 @@ function ClubHomeScreen(props) {
                     value={meetingLocation}
                     onChange={(e) => setMeetingLocation(e.target.value)}
                   />
+                  
 
-                  <p>Please select a suggested date for the in person book discussion. The group will have a chance to review and solidify the date.</p>
+                  <p>Please select a suggested date on the calander for the in person book discussion. The group will have a chance to review and solidify the date.</p>
                   <div className='calendar-container'>
-                    <Calendar onChange={setDate} value={date} />
+                    <Calendar onChange={setMeetingDate} value={meetingDate} />
                   </div>
                   <p className='text-center'>
                     <span className='bold'>Suggested date: </span>{' '}
-                    {date.toDateString()}
+                    {meetingDate.toDateString()}
 
                   </p>
+
+                  <label htmlFor="meetingTime-field">Meeting time - include AM vs PM: </label>
+                  <input
+                    id="meetingTime-field"
+                    type="text"
+                    className="form-control"
+                    value={meetingTime}
+                    onChange={(e) => setMeetingTime(e.target.value)}
+                  />
+
                 </div>
               
+                <button onClick={createBookDetails}>Confirm Book Details!</button>
+
               </div>)
             }
             {clubData.CurrentAdmin.ItemID !== JSON.parse(window.localStorage.getItem('USER_ID')) && <p>You do not have access to this page, only current admin does</p>}
 
-            <button onClick={createBookDetails}>Confirm Book Details!</button>
-{/* 
+            
+            {/* 
             should have a current book cycle own object, and then inside the club the id of the current book cycle 
             also inside the club, it should hold a list of previous book cycles and thats what will populate the history page  */}
+          </div>
+        )}
+
+        {clubData.CurrentAdmin && displayConfirmSelection && (
+          <div>
+            <p>Book Selection Complete! Now all members will be able to see {bookTitle} details on the 'Home' tab</p>
+            {/* Should add edit option here */}
           </div>
         )}
       </div>
 
       <div className={tabSelect === 3 ? "show-content" : "content"}>
-        <p>Tab 3</p>
+        <p>History</p>
       </div>
 
       <div className={tabSelect === 4 ? "show-content" : "content"}>
-        <p>Tab 4</p>
+        <p>Members</p>
       </div>
     </div>
   );

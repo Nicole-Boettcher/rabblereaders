@@ -32,6 +32,8 @@ function App() {
     window.localStorage.removeItem('CLUB_DATA')
     window.localStorage.removeItem('MEMBERS_DATA')
     window.localStorage.removeItem('MEMBERS_ID')
+    window.localStorage.removeItem('BOOK_CYCLE_ID')
+    window.localStorage.removeItem('BOOK_CYCLE_DATA')
   }
 
   return (
