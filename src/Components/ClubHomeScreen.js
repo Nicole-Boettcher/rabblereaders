@@ -234,13 +234,16 @@ function ClubHomeScreen(props) {
 
   const selectAdmin = async (adminID) => {
     console.log(adminID)
-    let admin = ""
+    let admin = {}
     membersData.forEach((member) => {
-      if (member.ItemID === adminID){
+      console.log("member: ", member.ItemID)
+      if (member.ItemID === parseInt(adminID)){
+        console.log("match")
         admin = member
       }
     })
 
+    console.log("Admin: ", admin)
     //add admin to the club settings THE WHOLE OBJECT -- new way of doing things
     const APIService = new APIcalls({
       "itemID": clubData.ItemID,
@@ -412,8 +415,8 @@ function ClubHomeScreen(props) {
 
       <div className={tabSelect === 2 ? "show-content" : "content"}>
         {clubData.CurrentAdmin &&
-          !displayConfirmSelection &&
-          bookCycleData === "" && (
+          !displayConfirmSelection && !bookCycleData && 
+          (
             <div>
               {clubData.CurrentAdmin.ItemID ===
                 JSON.parse(window.localStorage.getItem("USER_ID")) && (
@@ -514,8 +517,8 @@ function ClubHomeScreen(props) {
             </div>
           )}
 
-        {(bookCycleData ||
-          (clubData.CurrentAdmin && displayConfirmSelection)) && (
+        {
+          (clubData.CurrentAdmin && displayConfirmSelection) && (
           <div>
             <p>
               Book Selection Complete! Now all members will be able to see{" "}
@@ -524,6 +527,15 @@ function ClubHomeScreen(props) {
             {/* Should add edit option here */}
           </div>
         )}
+
+        {
+          clubData.CurrentAdmin && bookCycleData && (
+            <div>
+              <p>Edit book details -- in dev</p>
+            </div>
+
+          )
+        }
       </div>
 
       <div className={tabSelect === 3 ? "show-content" : "content"}>
