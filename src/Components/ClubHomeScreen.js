@@ -48,6 +48,9 @@ function ClubHomeScreen(props) {
     if (bookCycleData !== "") {
       console.log("Setting book cycle data")
       window.localStorage.setItem('BOOK_CYCLE_DATA', JSON.stringify(bookCycleData));
+      setMeetingLocation(bookCycleData.MeetingDetails.meetingLocation);
+      setMeetingDate(new Date(bookCycleData.MeetingDetails.meetingDate))
+      setMeetingTime(bookCycleData.MeetingDetails.meetingTime)
       console.log(bookCycleData)
     }
     if (textThreadData !== "") {
@@ -313,6 +316,54 @@ function ClubHomeScreen(props) {
     fetchBookCycleData();
   }
 
+  const confirmMeetingDetails = async () => {
+
+    //need up update just the meeting details of the book cycle object
+
+    const APIServiceClub = new APIcalls({
+      "itemID": bookCycleData.ItemID,
+      "itemType": "BookCycle",
+      "meetingDetails": {
+        "meetingLocation": meetingLocation, 
+        "meetingDate": meetingDate, 
+        "meetingTime": meetingTime
+      },
+      "operation": "UpdateItem",
+      "updateExpression": "SET"
+    })
+    const fetchResponse = await APIServiceClub.callQuery()
+    console.log("Update meeting details - response:")
+    console.log(fetchResponse)
+
+    const APIServiceClub2 = new APIcalls({
+      "itemID": bookCycleData.ItemID,
+      "itemType": "BookCycle",
+      "meetingStatus": "Confirmed",
+      "operation": "UpdateItem",
+      "updateExpression": "SET"
+    })
+
+    const fetchResponse2 = await APIServiceClub2.callQuery()
+    console.log("Update meeting status - response:")
+    console.log(fetchResponse2)
+
+    //clear messages 
+
+    const APIServiceClub3 = new APIcalls({
+      "itemID": textThreadData.ItemID,
+      "itemType": "TextThread",
+      "message": "",
+      "operation": "UpdateItem",
+      "updateExpression": "REMOVE"
+    })
+
+    const fetchResponse3 = await APIServiceClub3.callQuery()
+    console.log("Clear messages - response:")
+    console.log(fetchResponse3)
+
+    fetchBookCycleData();
+  }
+
   return (
     <div className="container">
       <div
@@ -328,7 +379,7 @@ function ClubHomeScreen(props) {
             Home
           </li>
           <li className="tabs" onClick={() => updateTabSelect(2)}>
-            Book Selection
+            Admin Duties
           </li>
           <li className="tabs" onClick={() => updateTabSelect(3)}>
             History
@@ -377,46 +428,72 @@ function ClubHomeScreen(props) {
                 Book Description: {bookCycleData.BookDetails.bookDescription}
               </p>
 
-              <h3>Meeting Details</h3>
-              <p>
+              {bookCycleData.MeetingStatus === "Review" && (
+                <div>
+                  <h3>SUGGESTED Meeting Details</h3>
+                </div>
+              )}
+              {bookCycleData.MeetingStatus === "Confirmed" && (
+                <div>
+                  <h3>CONFIRMED Meeting Details</h3>
+                </div>
+              )}
 
+              <p>
                 <p className="text-center">
-                  <span className="bold">Suggested Meeting Date: </span>{" "}
+                  <span >Meeting Date: </span>{" "}
                   {bookCycleData.MeetingDetails.meetingDate}
                 </p>
 
                 <div className="calendar-container">
                   <Calendar value={bookCycleData.MeetingDetails.meetingDate} />
                 </div>
-                
               </p>
+              <p>Meeting Time: {bookCycleData.MeetingDetails.meetingTime}</p>
               <p>
-                Suggested Meeting Time:{" "}
-                {bookCycleData.MeetingDetails.meetingTime}
-              </p>
-              <p>
-                Suggesting Meeting Location:{" "}
-                {bookCycleData.MeetingDetails.meetingLocation}
+                Meeting Location: {bookCycleData.MeetingDetails.meetingLocation}
               </p>
 
+              {/* make this bold and stand out */}
+
+              {bookCycleData.MeetingStatus === "Review" && (
+                <div>
+                  <p>Please use the chat below to discuss any conflicts in the suggest meeting details. Once group comes to a concenus, the admin will soildify details</p>
+                </div>
+              )}
+              {bookCycleData.MeetingStatus === "Confirmed" && (
+                <div>
+                  <p className="bold">Discuss below any meeting details (rides, food, attire, etc.)</p>
+                </div>
+              )}
               <TextThread
                 userData={userData}
                 membersData={membersData}
                 textThreadData={textThreadData}
               ></TextThread>
+
+              {/* Admin needs to confirm meeting details */}
+
+              {parseInt(clubData.CurrentAdmin.ItemID) ===
+                parseInt(JSON.parse(window.localStorage.getItem("USER_ID"))) &&
+                bookCycleData.MeetingStatus === "Review" && (
+                  <p>
+                    {clubData.CurrentAdmin.Username} - Once the group has
+                    decided on meeting details, please confirm in Book/Meeting
+                    Details
+                  </p>
+                )}
             </div>
           )}
         </div>
-
-
       </div>
       {/* if you are the admin you should pick the book and its details  */}
       {/* One tab should be named Book Selection and to fill out the form you must be the current admin  */}
 
       <div className={tabSelect === 2 ? "show-content" : "content"}>
         {clubData.CurrentAdmin &&
-          !displayConfirmSelection && !bookCycleData && 
-          (
+          !displayConfirmSelection &&
+          !bookCycleData && (
             <div>
               {clubData.CurrentAdmin.ItemID ===
                 JSON.parse(window.localStorage.getItem("USER_ID")) && (
@@ -517,8 +594,7 @@ function ClubHomeScreen(props) {
             </div>
           )}
 
-        {
-          (clubData.CurrentAdmin && displayConfirmSelection) && (
+        {clubData.CurrentAdmin && displayConfirmSelection && (
           <div>
             <p>
               Book Selection Complete! Now all members will be able to see{" "}
@@ -528,14 +604,56 @@ function ClubHomeScreen(props) {
           </div>
         )}
 
-        {
-          clubData.CurrentAdmin && bookCycleData && (
+        {clubData.CurrentAdmin &&
+          bookCycleData &&
+          bookCycleData.MeetingStatus === "Review" && (
             <div>
               <p>Edit book details -- in dev</p>
-            </div>
+              <h3 className="text-center">Confirm Meeting Details</h3>
 
-          )
-        }
+              <label htmlFor="meetingLocation-field">
+                Meeting location/Address (members home, restaurant, library,
+                etc.):{" "}
+              </label>
+              <input
+                id="meetingLocation-field"
+                type="text"
+                className="form-control"
+                value={meetingLocation}
+                onChange={(e) => setMeetingLocation(e.target.value)}
+              />
+
+              <p>Meeting Date:</p>
+              <div className="calendar-container">
+                <Calendar onChange={setMeetingDate} value={meetingDate} />
+              </div>
+              <p className="text-center">
+                <span className="bold">Selected date: </span>{" "}
+                {meetingDate.toDateString()}
+              </p>
+
+              <label htmlFor="meetingTime-field">
+                Meeting time - include AM vs PM:{" "}
+              </label>
+              <input
+                id="meetingTime-field"
+                type="text"
+                className="form-control"
+                value={meetingTime}
+                onChange={(e) => setMeetingTime(e.target.value)}
+              />
+
+              <button onClick={confirmMeetingDetails}>
+                Final Confirmation on Meeting Details!
+              </button>
+            </div>
+          )}
+
+        {bookCycleData.MeetingStatus === "Confirmed" && (
+          <div>
+            <p>Meeting Details Confirmed</p>
+          </div>
+        )}
       </div>
 
       <div className={tabSelect === 3 ? "show-content" : "content"}>

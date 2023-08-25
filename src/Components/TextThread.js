@@ -54,7 +54,7 @@ function TextThread(props) {
 
     return (
       <div className="container">
-        <h3>Please discuss any meeting conflicts in chat below with:</h3>
+        <h3>Chat!</h3>
 
 
         {/* it should display all previous texts and have the enter box at the bottom  */}
