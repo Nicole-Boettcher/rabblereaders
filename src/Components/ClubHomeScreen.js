@@ -30,6 +30,9 @@ function ClubHomeScreen(props) {
   const [meetingDate, setMeetingDate] = useState(new Date());
   const [displayConfirmSelection, setDisplayConfirmSelection] = useState(false);
 
+  const [discussionPoints, setDiscussionPoints] = useState("");
+  const [bookCycleResetConfirmVar, setBookCycleResetConfirmVar] = useState(false)
+
 
   useEffect(() => {
     if (userData !== "") {
@@ -159,6 +162,9 @@ function ClubHomeScreen(props) {
         setMembersData(prevList => [...prevList, fetchResponse.body])
       }
     }
+
+    console.log("User data: ", props.userData)
+    console.log("Club Selection ", props.clubSelection)
 
     fetchUserData()
     fetchClubData()
@@ -364,6 +370,75 @@ function ClubHomeScreen(props) {
     fetchBookCycleData();
   }
 
+  const sendDiscussionPoints = async () => {
+    //add discussionPoints to bookcycle object 
+
+    console.log("discussion points: ", discussionPoints)
+    const APIServiceClub = new APIcalls({
+      "itemID": bookCycleData.ItemID,
+      "itemType": "BookCycle",
+      "discussionPoints": discussionPoints,
+      "operation": "UpdateItem",
+      "updateExpression": "SET"
+    })
+
+    const fetchResponse = await APIServiceClub.callQuery()
+    console.log("Update discussion points - response:")
+    console.log(fetchResponse)
+
+    fetchBookCycleData();
+  }
+
+  const bookCycleReset = () => {
+    setBookCycleResetConfirmVar(true)
+  }
+
+  const bookCycleResetConfirm = async () => {
+
+    //THIS WORKS AS EXPECTED 
+
+    //1. Delete text thread object
+    //1. roll bookcycle over to history
+    //2. Delete the original object of bookcycle
+    //3. Delete current admin from club object
+    //4. Redo whole page
+
+    console.log("text thread ID: ", textThreadData.ItemID)
+    const APIServiceText = new APIcalls({
+      "itemID": textThreadData.ItemID,
+      "itemType": "TextThread",
+      "operation": "DeleteItem"
+    })
+    const fetchResponse = await APIServiceText.callQuery()
+    console.log("delete text thread: ", fetchResponse)
+
+    //roll book cycle over to history
+
+
+    //delete book cycle -- might not be nessasary
+    const APIServiceBookCycle = new APIcalls({
+      "itemID": bookCycleData.ItemID,
+      "itemType": "BookCycle",
+      "operation": "DeleteItem"
+    })
+    const fetchResponse2 = await APIServiceBookCycle.callQuery()
+    console.log("delete book cycle: ", fetchResponse2)
+
+
+    //remove current admin from club
+    const APIServiceAdmin = new APIcalls({
+      "itemID": clubData.ItemID,
+      "itemType": "Club",
+      "currentAdmin": "",
+      "operation": "UpdateItem",
+      "updateExpression": "REMOVE"
+    })
+    const fetchResponse3 = await APIServiceAdmin.callQuery()
+    console.log("delete club current admin: ", fetchResponse3)
+
+
+  }
+
   return (
     <div className="container">
       <div
@@ -420,52 +495,65 @@ function ClubHomeScreen(props) {
         <div>
           {bookCycleData && (
             <div>
-              <h3>Book Details</h3>
-              <p>Book Name: {bookCycleData.BookDetails.bookTitle}</p>
-              <p>Book Author: {bookCycleData.BookDetails.bookAuthor}</p>
-              <p>Book Genre: {bookCycleData.BookDetails.bookGenre}</p>
-              <p>
-                Book Description: {bookCycleData.BookDetails.bookDescription}
-              </p>
-
-              {bookCycleData.MeetingStatus === "Review" && (
-                <div>
-                  <h3>SUGGESTED Meeting Details</h3>
-                </div>
-              )}
-              {bookCycleData.MeetingStatus === "Confirmed" && (
-                <div>
-                  <h3>CONFIRMED Meeting Details</h3>
-                </div>
-              )}
-
-              <p>
-                <p className="text-center">
-                  <span >Meeting Date: </span>{" "}
-                  {bookCycleData.MeetingDetails.meetingDate}
+              <div className="container">
+                <h3>Book Details</h3>
+                <p>Book Name: {bookCycleData.BookDetails.bookTitle}</p>
+                <p>Book Author: {bookCycleData.BookDetails.bookAuthor}</p>
+                <p>Book Genre: {bookCycleData.BookDetails.bookGenre}</p>
+                <p>
+                  Book Description: {bookCycleData.BookDetails.bookDescription}
                 </p>
 
-                <div className="calendar-container">
-                  <Calendar value={bookCycleData.MeetingDetails.meetingDate} />
-                </div>
-              </p>
-              <p>Meeting Time: {bookCycleData.MeetingDetails.meetingTime}</p>
-              <p>
-                Meeting Location: {bookCycleData.MeetingDetails.meetingLocation}
-              </p>
+                {bookCycleData.MeetingStatus === "Review" && (
+                  <div>
+                    <h3>SUGGESTED Meeting Details</h3>
+                  </div>
+                )}
+                {bookCycleData.MeetingStatus === "Confirmed" && (
+                  <div>
+                    <h3>CONFIRMED Meeting Details</h3>
+                  </div>
+                )}
+
+                <p>
+                  <p className="text-center">
+                    <span>Meeting Date: </span>{" "}
+                    {new Date(
+                      bookCycleData.MeetingDetails.meetingDate
+                    ).toDateString()}
+                  </p>
+
+                  <div className="calendar-container">
+                    <Calendar value={bookCycleData.MeetingDetails.meetingDate} />
+                  </div>
+                </p>
+                <p>Meeting Time: {bookCycleData.MeetingDetails.meetingTime}</p>
+                <p>
+                  Meeting Location: {bookCycleData.MeetingDetails.meetingLocation}
+                </p>
+              </div>  
 
               {/* make this bold and stand out */}
 
               {bookCycleData.MeetingStatus === "Review" && (
                 <div>
-                  <p>Please use the chat below to discuss any conflicts in the suggest meeting details. Once group comes to a concenus, the admin will soildify details</p>
+                  <p>
+                    Please use the chat below to discuss any conflicts in the
+                    suggest meeting details. Once group comes to a concenus, the
+                    admin will soildify details
+                  </p>
                 </div>
               )}
               {bookCycleData.MeetingStatus === "Confirmed" && (
                 <div>
-                  <p className="bold">Discuss below any meeting details (rides, food, attire, etc.)</p>
+                  <p className="bold">
+                    Discuss below any meeting details (rides, food, attire,
+                    etc.)
+                  </p>
                 </div>
               )}
+
+
               <TextThread
                 userData={userData}
                 membersData={membersData}
@@ -474,7 +562,7 @@ function ClubHomeScreen(props) {
 
               {/* Admin needs to confirm meeting details */}
 
-              {parseInt(clubData.CurrentAdmin.ItemID) ===
+              {/* {parseInt(clubData.CurrentAdmin.ItemID) ===
                 parseInt(JSON.parse(window.localStorage.getItem("USER_ID"))) &&
                 bookCycleData.MeetingStatus === "Review" && (
                   <p>
@@ -482,7 +570,24 @@ function ClubHomeScreen(props) {
                     decided on meeting details, please confirm in Book/Meeting
                     Details
                   </p>
-                )}
+                )} */}
+
+              { bookCycleData.DiscussionPoints && (
+                <div className="container">
+                  <h3>
+                    Discussion Points
+                  </h3>
+                  <p>{bookCycleData.DiscussionPoints}</p>
+
+                  <button onClick={bookCycleReset}>In person meeting complete! Ready for new book</button>
+                  {bookCycleResetConfirmVar && (
+                    <div>
+                      <button onClick={bookCycleResetConfirm}>Confirm -- all above details will vanish</button>
+                    </div>
+                  )}
+                </div>
+              )}
+
             </div>
           )}
         </div>
@@ -649,11 +754,24 @@ function ClubHomeScreen(props) {
             </div>
           )}
 
-        {bookCycleData.MeetingStatus === "Confirmed" && (
+        {bookCycleData.MeetingStatus === "Confirmed" && clubData.CurrentAdmin.ItemID ===
+                JSON.parse(window.localStorage.getItem("USER_ID")) && !bookCycleData.DiscussionPoints && (
           <div>
             <p>Meeting Details Confirmed</p>
+
+            <h3>Please enter any discussion points you want the group to think about before you meet!</h3>
+              <input
+                id="discussionPoints-field"
+                type="text"
+                className="form-control"
+                value={discussionPoints}
+                onChange={(e) => setDiscussionPoints(e.target.value)}
+              />
+            <button onClick={sendDiscussionPoints}>Send to Group</button>
+
           </div>
         )}
+
       </div>
 
       <div className={tabSelect === 3 ? "show-content" : "content"}>
