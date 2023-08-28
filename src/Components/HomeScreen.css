@@ -37,7 +37,7 @@
   }
   
   .button {
-    background-color: #3498db;
+    background-color: #9b5a32fb;
     color: white;
     border: none;
     border-radius: 5px;
@@ -47,13 +47,13 @@
   }
   
   .button:hover {
-    background-color: #2980b9;
+    background-color: #9b5a329d;
   }
   
   .link-button {
     display: inline-block;
     margin-top: 20px;
-    background-color: #3498db;
+    background-color: #9b5a32fb;
     color: white;
     text-decoration: none;
     border: none;
@@ -64,6 +64,6 @@
   }
   
   .link-button:hover {
-    background-color: #2980b9;
+    background-color: #ab7757fb;
   }
   

@@ -608,11 +608,12 @@ function ClubHomeScreen(props) {
                       bookCycleData.MeetingDetails.meetingDate
                     ).toDateString()}
                   </p>
-
-                  <div className="calendar-container">
-                    <Calendar
-                      value={bookCycleData.MeetingDetails.meetingDate}
-                    />
+                  <div className="center-container">
+                    <div className="calendar-container">
+                      <Calendar
+                        value={bookCycleData.MeetingDetails.meetingDate}
+                      />
+                    </div>
                   </div>
                 </p>
                 <p>Meeting Time: {bookCycleData.MeetingDetails.meetingTime}</p>
@@ -627,8 +628,7 @@ function ClubHomeScreen(props) {
               {bookCycleData.MeetingStatus === "Review" && (
                 <div>
                   <p>
-                    Please use the chat below to discuss any conflicts in the
-                    suggest meeting details. Once group comes to a concenus, the
+                    Please use the chat below to discuss any meeting conflicts or confirm your availability. Once group comes to a concenus, the
                     admin will soildify details
                   </p>
                 </div>
@@ -750,8 +750,10 @@ function ClubHomeScreen(props) {
                       person book discussion. The group will have a chance to
                       review and solidify the date.
                     </p>
-                    <div className="calendar-container">
-                      <Calendar onChange={setMeetingDate} value={meetingDate} />
+                    <div className="center-container">
+                      <div className="calendar-container">
+                        <Calendar onChange={setMeetingDate} value={meetingDate} />
+                      </div>
                     </div>
                     <p className="text-center">
                       <span className="bold">Suggested date: </span>{" "}
@@ -819,8 +821,10 @@ function ClubHomeScreen(props) {
               />
 
               <p>Meeting Date:</p>
-              <div className="calendar-container">
-                <Calendar onChange={setMeetingDate} value={meetingDate} />
+              <div className="center-container">
+                <div className="calendar-container">
+                  <Calendar onChange={setMeetingDate} value={meetingDate} />
+                </div>
               </div>
               <p className="text-center">
                 <span className="bold">Selected date: </span>{" "}
@@ -871,12 +875,14 @@ function ClubHomeScreen(props) {
         <p>History</p>
         {historyData.BookLog && (
           <div>
-            <table>
+            <table className="styled-table">
               <thead>
                 <tr>
-                  <th>Book Name </th>
+                  <th>Book Title</th>
                   <th>Author</th>
                   <th>Genre</th>
+                  <th>Book Selector</th>
+                  <th>Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -885,6 +891,8 @@ function ClubHomeScreen(props) {
                     <td>{book.BookDetails.bookTitle}</td>
                     <td>{book.BookDetails.bookAuthor}</td>
                     <td>{book.BookDetails.bookGenre}</td>
+                    <td>{book.Admin.name}</td>
+                    <td>{new Date(book.MeetingDetails.meetingDate).toDateString()}</td>
                   </tr>
                 ))}
               </tbody>

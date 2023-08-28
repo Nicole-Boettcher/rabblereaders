@@ -1,0 +1,11 @@
+/* global.css */
+:root {
+    --cream-color: #ffefcb; /* Define your cream color here */
+  }
+  
+  body {
+    background-color: var(--cream-color);
+    margin: 0; /* Reset default margin */
+    padding: 0; /* Reset default padding */
+  }
+  

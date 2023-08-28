@@ -17,7 +17,7 @@
     display: inline-block;
     padding: 10px 20px;
     margin: 10px;
-    background-color: #3498db;
+    background-color: #9b5a32fb;
     color: white;
     text-decoration: none;
     border: none;
@@ -27,6 +27,6 @@
   }
   
   .link-button:hover {
-    background-color: #2980b9;
+    background-color: #ab7757fb;
   }
   

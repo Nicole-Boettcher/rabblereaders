@@ -6,6 +6,7 @@ import CreateClubScreen from "./Components/CreateClubScreen";
 import CreateAccountScreen from "./Components/CreateAccountScreen";
 import WelcomeScreen from "./Components/WelcomeScreen";
 import ClubHomeScreen from "./Components/ClubHomeScreen";
+import './App.css';
 
 function App() {
   //holds {username, password}, needs to be verified once server is running

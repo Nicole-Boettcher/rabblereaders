@@ -134,7 +134,6 @@ function HomeScreen(props) {
   return (
     <div className="container">
       <h1 className="heading">Home Screen</h1>
-      {userData && <p>Username: {userData.Username}</p>}
 
       <div className="invite-section">
         <h3>Club Invites:</h3>

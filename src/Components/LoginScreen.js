@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import APIcalls from "../Utils/APIcalls";
+import "./LoginScreen.css"
 
 function LoginScreen(props) {
   const [username, setUsername] = useState("");
@@ -82,41 +83,43 @@ function LoginScreen(props) {
 
   return (
     <div className="container">
-      
       <h2>Login:</h2>
       <div className="row">
-        <label htmlFor="name-field">Username: </label>
-        <input
-          id="name-field"
-          type="text"
-          className="form-control"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <label htmlFor="password-field">Password: </label>
-        <input
-          id="password-field"
-          type="text"
-          className="form-control"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="input-group">
+          <label htmlFor="name-field">Username: </label>
+          <input
+            id="name-field"
+            type="text"
+            className="form-control"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="password-field">Password: </label>
+          <input
+            id="password-field"
+            type="password"
+            className="form-control"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* <Link to="/home" onClick={sendLoginData}>
-        Enter
-      </Link> */}
-      <button onClick={fetchDataFromApi}>Login</button>
-      {loginSuccess ? <Link to="/home">Success! Click to Continue</Link> : null}
-      {loginError ? <p>Error: Username or password incorrect, please try again</p> : null}
-      {/* <ul>
-        {response.map((user) => (
-          <li key={user.ItemID}>
-            Username: {user.Username}, Password: {user.Password}
-          </li>
-        ))}
-      </ul> */}
-
+      <button className="login-button" onClick={fetchDataFromApi}>
+        Login
+      </button>
+      {loginSuccess ? (
+        <Link className="success-link" to="/home">
+          Success! Click to Continue
+        </Link>
+      ) : null}
+      {loginError ? (
+        <p className="error-message">
+          Error: Username or password incorrect, please try again
+        </p>
+      ) : null}
     </div>
   );
 }
