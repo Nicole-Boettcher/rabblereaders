@@ -71,6 +71,17 @@ function CreateClubScreen(props) {
         "updateExpression": "SET"
       })
       await APIServiceClub2.callQuery()
+      //ABOVE COULD BE ABSORBED BY JUST THE PUTITEM 
+
+      const APIServiceHistory = new APIcalls({
+        "itemType": "HistoryLog",
+        "username": clubName,
+        "parentClubID": fetchResponse.id, //new club ID
+        "operation": "PutItem"
+      })
+      const fetchResponseHistory = await APIServiceHistory.callQuery()
+      console.log("Create new history response:")
+      console.log(fetchResponseHistory)
 
       //add club name to user profile?
 

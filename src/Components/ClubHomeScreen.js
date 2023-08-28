@@ -13,6 +13,7 @@ function ClubHomeScreen(props) {
   //1. Fetch all data about club and store it locally 
   const [userData, setUserData] = useState(""); 
   const [clubData, setClubData] = useState("");
+  const [historyData, setHistoryData] = useState("");
   const [bookCycleData, setBookCycleData] = useState("");
   const [textThreadData, setTextThreadData] = useState("")
   const [membersData, setMembersData] = useState([]);
@@ -32,6 +33,7 @@ function ClubHomeScreen(props) {
 
   const [discussionPoints, setDiscussionPoints] = useState("");
   const [bookCycleResetConfirmVar, setBookCycleResetConfirmVar] = useState(false)
+  const [booksToDate, setBooksToDate] = useState(0)
 
 
   useEffect(() => {
@@ -47,6 +49,11 @@ function ClubHomeScreen(props) {
       console.log("Setting club data")
       window.localStorage.setItem('CLUB_ID', JSON.stringify(clubData.ItemID));
       window.localStorage.setItem('CLUB_DATA', JSON.stringify(clubData));
+    }
+    if (historyData !== "") {
+      console.log("Setting history data")
+      window.localStorage.setItem('HISTORY_ID', JSON.stringify(historyData.ItemID));
+      window.localStorage.setItem('HISTORY_DATA', JSON.stringify(historyData));
     }
     if (bookCycleData !== "") {
       console.log("Setting book cycle data")
@@ -72,7 +79,7 @@ function ClubHomeScreen(props) {
       window.localStorage.setItem('MEMBERS_DATA', JSON.stringify(membersData));
     }
     
-  }, [clubData, membersData, bookCycleData, textThreadData]);
+  }, [clubData, historyData, membersData, bookCycleData, textThreadData]);
   
 
   useEffect(() => {
@@ -134,6 +141,38 @@ function ClubHomeScreen(props) {
       }
     }
 
+    async function fetchHistoryData() {
+
+      let id = props.clubSelection.ItemID
+
+      if (id === undefined) {
+        //need to get ID from local storage 
+        console.log("grabbing id for history query from local storage")
+        const data = window.localStorage.getItem('HISTORY_ID')
+        id = JSON.parse(data)
+      }
+
+
+      console.log("Call API query to get history Info: ", props.clubSelection.ItemID)
+
+      const APIService = new APIcalls({
+        "itemType": "HistoryLog",
+        "parentClubID": id,
+        "operation": "Query"
+      })
+
+      const fetchResponse = await APIService.callQuery();
+      console.log("Query response for book cycle based on club id:");
+      console.log(fetchResponse);
+
+      if (fetchResponse.body.length === 0) {
+        console.log("No history found, problem");
+      } else {
+        setHistoryData(fetchResponse.body[0])
+      }
+
+    }
+
     async function fetchMemberData() {
 
       setMembersData([]) //API better work then if wiping it first
@@ -163,16 +202,14 @@ function ClubHomeScreen(props) {
       }
     }
 
-    console.log("User data: ", props.userData)
-    console.log("Club Selection ", props.clubSelection)
-
     fetchUserData()
     fetchClubData()
+    fetchHistoryData()
     fetchBookCycleData() 
     fetchMemberData()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [window.location.href, displaySelectAdmin]);
+  }, [window.location.href, displaySelectAdmin, booksToDate]);
 
 
   const fetchBookCycleData = async () => {
@@ -414,6 +451,18 @@ function ClubHomeScreen(props) {
 
     //roll book cycle over to history
 
+    console.log("add book cycle to history")
+        // take message and add it to the text thread 
+    const APIServiceHistory = new APIcalls({
+        "itemID": historyData.ItemID,
+        "itemType": "HistoryLog",
+        "bookLog": bookCycleData,
+        "operation": "UpdateItem",
+        "updateExpression": "SET"
+    })
+      
+    const fetchResponseHistory = await APIServiceHistory.callQuery()
+    console.log("add to history: ", fetchResponseHistory)
 
     //delete book cycle -- might not be nessasary
     const APIServiceBookCycle = new APIcalls({
@@ -436,7 +485,7 @@ function ClubHomeScreen(props) {
     const fetchResponse3 = await APIServiceAdmin.callQuery()
     console.log("delete club current admin: ", fetchResponse3)
 
-
+    setBooksToDate(booksToDate+1)
   }
 
   return (
@@ -524,14 +573,17 @@ function ClubHomeScreen(props) {
                   </p>
 
                   <div className="calendar-container">
-                    <Calendar value={bookCycleData.MeetingDetails.meetingDate} />
+                    <Calendar
+                      value={bookCycleData.MeetingDetails.meetingDate}
+                    />
                   </div>
                 </p>
                 <p>Meeting Time: {bookCycleData.MeetingDetails.meetingTime}</p>
                 <p>
-                  Meeting Location: {bookCycleData.MeetingDetails.meetingLocation}
+                  Meeting Location:{" "}
+                  {bookCycleData.MeetingDetails.meetingLocation}
                 </p>
-              </div>  
+              </div>
 
               {/* make this bold and stand out */}
 
@@ -553,7 +605,6 @@ function ClubHomeScreen(props) {
                 </div>
               )}
 
-
               <TextThread
                 userData={userData}
                 membersData={membersData}
@@ -572,22 +623,23 @@ function ClubHomeScreen(props) {
                   </p>
                 )} */}
 
-              { bookCycleData.DiscussionPoints && (
+              {bookCycleData.DiscussionPoints && (
                 <div className="container">
-                  <h3>
-                    Discussion Points
-                  </h3>
+                  <h3>Discussion Points</h3>
                   <p>{bookCycleData.DiscussionPoints}</p>
 
-                  <button onClick={bookCycleReset}>In person meeting complete! Ready for new book</button>
+                  <button onClick={bookCycleReset}>
+                    In person meeting complete! Ready for new book
+                  </button>
                   {bookCycleResetConfirmVar && (
                     <div>
-                      <button onClick={bookCycleResetConfirm}>Confirm -- all above details will vanish</button>
+                      <button onClick={bookCycleResetConfirm}>
+                        Confirm -- all above details will vanish
+                      </button>
                     </div>
                   )}
                 </div>
               )}
-
             </div>
           )}
         </div>
@@ -754,12 +806,17 @@ function ClubHomeScreen(props) {
             </div>
           )}
 
-        {bookCycleData.MeetingStatus === "Confirmed" && clubData.CurrentAdmin.ItemID ===
-                JSON.parse(window.localStorage.getItem("USER_ID")) && !bookCycleData.DiscussionPoints && (
-          <div>
-            <p>Meeting Details Confirmed</p>
+        {bookCycleData.MeetingStatus === "Confirmed" &&
+          clubData.CurrentAdmin.ItemID ===
+            JSON.parse(window.localStorage.getItem("USER_ID")) &&
+          !bookCycleData.DiscussionPoints && (
+            <div>
+              <p>Meeting Details Confirmed</p>
 
-            <h3>Please enter any discussion points you want the group to think about before you meet!</h3>
+              <h3>
+                Please enter any discussion points you want the group to think
+                about before you meet!
+              </h3>
               <input
                 id="discussionPoints-field"
                 type="text"
@@ -767,15 +824,33 @@ function ClubHomeScreen(props) {
                 value={discussionPoints}
                 onChange={(e) => setDiscussionPoints(e.target.value)}
               />
-            <button onClick={sendDiscussionPoints}>Send to Group</button>
-
-          </div>
-        )}
-
+              <button onClick={sendDiscussionPoints}>Send to Group</button>
+            </div>
+          )}
       </div>
 
       <div className={tabSelect === 3 ? "show-content" : "content"}>
         <p>History</p>
+        {historyData.BookLog && (
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Book Name</th>
+                  <th>Author</th>
+                  <th>Admin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {historyData.BookLog.map((book, index) => (
+                  <tr key={index}>
+                    <td>{book.bookTitle}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className={tabSelect === 4 ? "show-content" : "content"}>
