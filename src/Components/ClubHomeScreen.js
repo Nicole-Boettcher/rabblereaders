@@ -80,7 +80,20 @@ function ClubHomeScreen(props) {
     }
     
   }, [clubData, historyData, membersData, bookCycleData, textThreadData]);
-  
+
+  useEffect(() => {
+    if (clubData !== "") {
+      console.log("Setting club data")
+      window.localStorage.setItem('CLUB_ID', JSON.stringify(clubData.ItemID));
+      window.localStorage.setItem('CLUB_DATA', JSON.stringify(clubData));
+    }
+    if (historyData !== "") {
+      console.log("Setting history data")
+      window.localStorage.setItem('HISTORY_ID', JSON.stringify(historyData.ItemID));
+      window.localStorage.setItem('HISTORY_DATA', JSON.stringify(historyData));
+    }
+  }, [clubData, historyData]);
+
 
   useEffect(() => {
 
@@ -485,7 +498,13 @@ function ClubHomeScreen(props) {
     const fetchResponse3 = await APIServiceAdmin.callQuery()
     console.log("delete club current admin: ", fetchResponse3)
 
-    setBooksToDate(booksToDate+1)
+    window.localStorage.removeItem('BOOK_CYCLE_ID')
+    window.localStorage.removeItem('BOOK_CYCLE_DATA')
+    window.localStorage.removeItem('TEXT_THREAD_DATA')
+
+    setDisplaySelectAdmin(true)
+
+    //setBooksToDate(booksToDate+1)
   }
 
   return (
