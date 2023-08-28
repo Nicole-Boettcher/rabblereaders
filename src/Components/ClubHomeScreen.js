@@ -33,9 +33,11 @@ function ClubHomeScreen(props) {
 
   const [discussionPoints, setDiscussionPoints] = useState("");
   const [bookCycleResetConfirmVar, setBookCycleResetConfirmVar] = useState(false)
-  const [booksToDate, setBooksToDate] = useState(0)
+  const [resetCycle, setResetCycle] = useState(0)
 
 
+
+  //Use Effects for setting states
   useEffect(() => {
     if (userData !== "") {
       console.log("Set user data ID")
@@ -50,11 +52,17 @@ function ClubHomeScreen(props) {
       window.localStorage.setItem('CLUB_ID', JSON.stringify(clubData.ItemID));
       window.localStorage.setItem('CLUB_DATA', JSON.stringify(clubData));
     }
+  }, [clubData]);
+
+  useEffect(() => {
     if (historyData !== "") {
       console.log("Setting history data")
       window.localStorage.setItem('HISTORY_ID', JSON.stringify(historyData.ItemID));
       window.localStorage.setItem('HISTORY_DATA', JSON.stringify(historyData));
     }
+  }, [historyData]);
+
+  useEffect(() => {
     if (bookCycleData !== "") {
       console.log("Setting book cycle data")
       window.localStorage.setItem('BOOK_CYCLE_DATA', JSON.stringify(bookCycleData));
@@ -63,11 +71,17 @@ function ClubHomeScreen(props) {
       setMeetingTime(bookCycleData.MeetingDetails.meetingTime)
       console.log(bookCycleData)
     }
+  }, [bookCycleData]);
+
+  useEffect(() => {
     if (textThreadData !== "") {
       console.log("Setting text thread data")
       window.localStorage.setItem('TEXT_THREAD_DATA', JSON.stringify(textThreadData));
       console.log(textThreadData)
     }
+  }, [textThreadData]);
+
+  useEffect(() => {
     if (membersData && membersData.length !== 0) {
       console.log("Setting member data: ", membersData)
       let ids = []
@@ -79,27 +93,12 @@ function ClubHomeScreen(props) {
       window.localStorage.setItem('MEMBERS_DATA', JSON.stringify(membersData));
     }
     
-  }, [clubData, historyData, membersData, bookCycleData, textThreadData]);
+  }, [membersData]);
 
-  useEffect(() => {
-    if (clubData !== "") {
-      console.log("Setting club data")
-      window.localStorage.setItem('CLUB_ID', JSON.stringify(clubData.ItemID));
-      window.localStorage.setItem('CLUB_DATA', JSON.stringify(clubData));
-    }
-    if (historyData !== "") {
-      console.log("Setting history data")
-      window.localStorage.setItem('HISTORY_ID', JSON.stringify(historyData.ItemID));
-      window.localStorage.setItem('HISTORY_DATA', JSON.stringify(historyData));
-    }
-  }, [clubData, historyData]);
-
-
+  //Use Effects for fetching data from API -- used to update changed data 
   useEffect(() => {
 
-    async function fetchUserData() {
-      console.log("Call API to get userInfo: ", props.userData.ItemID)
-    
+    async function fetchUserData() {    
       let id = props.userData.ItemID
 
       if (id === undefined) {
@@ -109,13 +108,15 @@ function ClubHomeScreen(props) {
         id = JSON.parse(data)
       }
 
+      console.log("1. Call API to get userInfo, ID: ", props.userData.ItemID)
+
       const APIService = new APIcalls({
         "itemID": id,
         "itemType": "User",
         "operation": "GetItem"
       })
       const fetchResponse = await APIService.callQuery()
-      console.log("Get updated User now:")
+      console.log("UserInfo API back, updated User now:")
       console.log(fetchResponse)
       if (fetchResponse.statusCode === 200) {
          setUserData(fetchResponse.body)
@@ -137,7 +138,7 @@ function ClubHomeScreen(props) {
       }
 
 
-      console.log("Call API to get club Info: ", props.clubSelection.ItemID)
+      console.log("2. Call API to get club Info, ID: ", id)
 
       const APIService = new APIcalls({
         "itemID": id,
@@ -145,7 +146,7 @@ function ClubHomeScreen(props) {
         "operation": "GetItem"
       })
       const fetchResponse = await APIService.callQuery()
-      console.log("Got updated Club now:")
+      console.log("API back, Got updated Club now:")
       console.log(fetchResponse)
       if (fetchResponse.statusCode === 200) {
          setClubData(fetchResponse.body)
@@ -166,7 +167,7 @@ function ClubHomeScreen(props) {
       }
 
 
-      console.log("Call API query to get history Info: ", props.clubSelection.ItemID)
+      console.log("3. Call API query to get history Info, ID: ", id)
 
       const APIService = new APIcalls({
         "itemType": "HistoryLog",
@@ -175,7 +176,7 @@ function ClubHomeScreen(props) {
       })
 
       const fetchResponse = await APIService.callQuery();
-      console.log("Query response for book cycle based on club id:");
+      console.log("API back, Query response for history based on club id:");
       console.log(fetchResponse);
 
       if (fetchResponse.body.length === 0) {
@@ -190,7 +191,7 @@ function ClubHomeScreen(props) {
 
       setMembersData([]) //API better work then if wiping it first
 
-      console.log("Call API to get member Info")
+      console.log("4. Call API to get member Info")
     
       let members = props.clubSelection.MemberIDs
 
@@ -218,17 +219,16 @@ function ClubHomeScreen(props) {
     fetchUserData()
     fetchClubData()
     fetchHistoryData()
-    fetchBookCycleData() 
     fetchMemberData()
+    fetchBookCycleData() 
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [window.location.href, displaySelectAdmin, booksToDate]);
+  }, [window.location.href, displaySelectAdmin, resetCycle]);
 
 
   const fetchBookCycleData = async () => {
 
     let id = props.clubSelection.ItemID
-    console.log("helllllo")
 
     if (id === undefined) {
       //need to get ID from local storage 
@@ -237,6 +237,8 @@ function ClubHomeScreen(props) {
       id = JSON.parse(data)
       console.log("id: ", id)
     }
+
+    console.log("5. Call API query to get book cycle info, ID: ", id)
 
     const APIService = new APIcalls({
       "itemType": "BookCycle",
@@ -285,7 +287,9 @@ function ClubHomeScreen(props) {
 
     fetchTextThread()
 
-  }, [bookCycleData])
+  }, [bookCycleData]) //after main useEffect triggers, this triggers -- dont understand how this runs before 248
+
+  //Use Effects done ----------------------------------------
 
   const handleDropdownChange = (event) => {
     setSelectedValue(event.target.value);
@@ -465,7 +469,7 @@ function ClubHomeScreen(props) {
     //roll book cycle over to history
 
     console.log("add book cycle to history")
-        // take message and add it to the text thread 
+    console.log("historyData.ItemID: ", historyData.ItemID)
     const APIServiceHistory = new APIcalls({
         "itemID": historyData.ItemID,
         "itemType": "HistoryLog",
@@ -502,9 +506,23 @@ function ClubHomeScreen(props) {
     window.localStorage.removeItem('BOOK_CYCLE_DATA')
     window.localStorage.removeItem('TEXT_THREAD_DATA')
 
+    setBookCycleData("");
+    setTextThreadData("");
     setDisplaySelectAdmin(true)
+    setDisplayConfirmSelection(false)
+    setSelectedValue('')
+    setBookCycleResetConfirmVar(false)
 
-    //setBooksToDate(booksToDate+1)
+    setBookTitle("");
+    setBookAuthor("");
+    setBookGenre("");
+    setBookDescription("");
+    setMeetingLocation("");
+    setMeetingTime("");
+    setMeetingDate(new Date());
+    setDiscussionPoints("");
+
+    setResetCycle(resetCycle+1)
   }
 
   return (
@@ -780,7 +798,8 @@ function ClubHomeScreen(props) {
           </div>
         )}
 
-        {clubData.CurrentAdmin &&
+        {clubData.CurrentAdmin && clubData.CurrentAdmin.ItemID ===
+            JSON.parse(window.localStorage.getItem("USER_ID")) &&
           bookCycleData &&
           bookCycleData.MeetingStatus === "Review" && (
             <div>
@@ -825,7 +844,7 @@ function ClubHomeScreen(props) {
             </div>
           )}
 
-        {bookCycleData.MeetingStatus === "Confirmed" &&
+        {bookCycleData.MeetingStatus === "Confirmed" && clubData.CurrentAdmin &&
           clubData.CurrentAdmin.ItemID ===
             JSON.parse(window.localStorage.getItem("USER_ID")) &&
           !bookCycleData.DiscussionPoints && (
@@ -855,15 +874,17 @@ function ClubHomeScreen(props) {
             <table>
               <thead>
                 <tr>
-                  <th>Book Name</th>
+                  <th>Book Name </th>
                   <th>Author</th>
-                  <th>Admin</th>
+                  <th>Genre</th>
                 </tr>
               </thead>
               <tbody>
                 {historyData.BookLog.map((book, index) => (
                   <tr key={index}>
-                    <td>{book.bookTitle}</td>
+                    <td>{book.BookDetails.bookTitle}</td>
+                    <td>{book.BookDetails.bookAuthor}</td>
+                    <td>{book.BookDetails.bookGenre}</td>
                   </tr>
                 ))}
               </tbody>
