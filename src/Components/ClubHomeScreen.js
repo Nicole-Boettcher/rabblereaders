@@ -665,7 +665,7 @@ function ClubHomeScreen(props) {
                   <p>{bookCycleData.DiscussionPoints}</p>
 
                   <button onClick={bookCycleReset}>
-                    In person meeting complete! Ready for new book
+                    Admin! Click here once meeting has been held. Ready for a new book!
                   </button>
                   {bookCycleResetConfirmVar && (
                     <div>
@@ -730,7 +730,7 @@ function ClubHomeScreen(props) {
                   </div>
 
                   <div className="container">
-                    <h3 className="text-center">Meeting Details</h3>
+                    <h3 className="text-center">Suggested Meeting Details</h3>
 
                     <label htmlFor="meetingLocation-field">
                       Meeting location/Address (members home, restaurant,
@@ -771,7 +771,7 @@ function ClubHomeScreen(props) {
                   </div>
 
                   <button onClick={createBookDetails}>
-                    Confirm Book Details!
+                    Send suggested meeting details to group!
                   </button>
                 </div>
               )}

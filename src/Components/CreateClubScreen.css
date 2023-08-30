@@ -9,7 +9,6 @@
   
   .title {
     color: maroon;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
   }
 
   .cartoon-images img {
@@ -71,9 +70,8 @@
   .invite-button,
   .create-button,
   .success-link {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
     font-size: 16px;
-    background-color: #a74815; /* Pink background color */
+    background-color: #a74815;
     color: white;
     padding: 8px 16px;
     border: none;
