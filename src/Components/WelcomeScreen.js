@@ -1,8 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import "./WelcomeScreen.css"; // Import the CSS file
 
 function WelcomeScreen(props) {
+
+  useEffect(() => {
+    window.localStorage.removeItem('USER_ID')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [window.location.href]);
+  
   return (
     <div className="container">
       <div className="row">

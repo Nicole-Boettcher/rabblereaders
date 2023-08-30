@@ -650,15 +650,14 @@ function ClubHomeScreen(props) {
 
               {/* Admin needs to confirm meeting details */}
 
-              {/* {parseInt(clubData.CurrentAdmin.ItemID) ===
+              {clubData.CurrentAdmin && bookCycleData.MeetingStatus && parseInt(clubData.CurrentAdmin.ItemID) ===
                 parseInt(JSON.parse(window.localStorage.getItem("USER_ID"))) &&
                 bookCycleData.MeetingStatus === "Review" && (
                   <p>
                     {clubData.CurrentAdmin.Username} - Once the group has
-                    decided on meeting details, please confirm in Book/Meeting
-                    Details
+                    decided on meeting details, please confirm in the 'Admin Duties' tab
                   </p>
-                )} */}
+                )}
 
               {bookCycleData.DiscussionPoints && (
                 <div className="container">
@@ -756,7 +755,6 @@ function ClubHomeScreen(props) {
                       </div>
                     </div>
                     <p className="text-center">
-                      <span className="bold">Suggested date: </span>{" "}
                       {meetingDate.toDateString()}
                     </p>
 
@@ -804,8 +802,7 @@ function ClubHomeScreen(props) {
             JSON.parse(window.localStorage.getItem("USER_ID")) &&
           bookCycleData &&
           bookCycleData.MeetingStatus === "Review" && (
-            <div>
-              <p>Edit book details -- in dev</p>
+            <div className="container">
               <h3 className="text-center">Confirm Meeting Details</h3>
 
               <label htmlFor="meetingLocation-field">
@@ -827,7 +824,6 @@ function ClubHomeScreen(props) {
                 </div>
               </div>
               <p className="text-center">
-                <span className="bold">Selected date: </span>{" "}
                 {meetingDate.toDateString()}
               </p>
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import APIcalls from "../Utils/APIcalls";
 import "./LoginScreen.css"
 
@@ -9,6 +9,11 @@ function LoginScreen(props) {
   const [password, setPassword] = useState("");
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginError, setLoginError] = useState(false);
+
+  useEffect(() => {
+    window.localStorage.removeItem('USER_ID')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [window.location.href]);
 
   const fetchDataFromApi = async () => {
     setLoginError(false);
@@ -34,52 +39,6 @@ function LoginScreen(props) {
       }
       //console.log(response)
   }
-
-  // const sendLoginData = () => {
-
-  //   setLoginError(false);
-  //   setLoginSuccess(false);
-  //   const dataToSend = {
-  //       "itemType": "User",
-  //       "username": username,
-  //       "operation": "Query"
-  //   }
-
-  //   console.log(JSON.stringify(dataToSend))
-
-  //   const requestOptions = {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(dataToSend),
-  //   };
-
-  //   fetch(
-  //     "https://1s6o72uevg.execute-api.ca-central-1.amazonaws.com/Dev/bookclub",
-  //     requestOptions
-  //   )
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       //setResponse(data);
-  //       console.log("HERE:")
-  //       console.log(data.body);
-  //       console.log(JSON.stringify(data.body))
-  //       if (data.body.length === 1 && data.body[0].Password === password){
-  //         //login data is detected and user should be logged in
-  //         setLoginSuccess(true);
-  //         setIDCount(IDCount + 1);
-  //         console.log(data.body[0])
-  //         props.updateUserData(data.body[0]);
-  //       } else {
-  //         setLoginError(true);
-  //       }
-  //     })
-  //     .catch((error) => console.error("Error making POST request:", error));
-
-  
-      
-  // };
 
   return (
     <div className="container">
