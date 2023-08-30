@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import APIcalls from "../Utils/APIcalls";
+import './LoginScreen.css'
 
 function CreateAccountScreen(props) {
   //const history = useHistory();
@@ -79,33 +80,37 @@ function CreateAccountScreen(props) {
     <div className="container">
       <h2>Create New Account:</h2>
       <div className="row">
-        <label htmlFor="name-field">Username: </label>
-        <input
-          id="name-field"
-          type="text"
-          className="form-control"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <label htmlFor="password-field">Password: </label>
-        <input
-          id="password-field"
-          type="text"
-          className="form-control"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="input-group">
+            <label htmlFor="name-field">Username: </label>
+            <input
+              id="name-field"
+              type="text"
+              className="form-control"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+        </div>
+        <div className="input-group">
+            <label htmlFor="password-field">Password: </label>
+            <input
+              id="password-field"
+              type="text"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+        </div>
       </div>
 
-      <button onClick={validateData}>Create Account</button>
+      <button className="login-button" onClick={validateData}>Create Account</button>
       {usernameTaken ? (
-        <p>Username is taken, please enter a new username.</p>
+        <p className="error-message">Username is taken, please enter a new username.</p>
       ) : null}
       {dataError ? (
-        <p>Username and Password must be longer than 4 characters.</p>
+        <p className="error-message">Username and Password must be longer than 4 characters.</p>
       ) : null}
       {createAccountSuccess ? (
-        <Link to="/home">Success! Click to Continue</Link>
+        <Link className="success-link" to="/home">Success! Click to Continue</Link>
       ) : null}
 
       {/* <ul>

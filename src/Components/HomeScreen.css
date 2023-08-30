@@ -7,7 +7,7 @@
   }
   
   .heading {
-    text-align: center;
+    text-align: left;
     margin-bottom: 20px;
     color: #333;
   }
@@ -47,7 +47,7 @@
   }
   
   .button:hover {
-    background-color: #9b5a329d;
+    background-color: #d0a161;
   }
   
   .link-button {
@@ -64,6 +64,6 @@
   }
   
   .link-button:hover {
-    background-color: #ab7757fb;
+    background-color: #d0a161;
   }
   

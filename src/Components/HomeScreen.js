@@ -1,14 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import APIcalls from "../Utils/APIcalls";
 import './HomeScreen.css'
 
 function HomeScreen(props) {
-  //when this page first loads, it should take the user data and fetch the profile from the db so it is saved
+  const navigate = useNavigate();
+
   const [userData, setUserData] = useState(""); // Use storedUserData as initial state
   const [clubDetails, setClubDetails] = useState([]);
-  const [clubLinkReady, setClubLinkReady] = useState(false);
 
   useEffect(() => {
     if (userData !== "") {
@@ -89,7 +89,7 @@ function HomeScreen(props) {
 
   const sendClubSelection = (club) => {
     props.updateClubSelection(club);
-    setClubLinkReady(true);
+    navigate("/clubHome")
   }
 
   const acceptClubInvite = async () => {
@@ -168,12 +168,6 @@ function HomeScreen(props) {
           ))}
         </ul>
       </div>
-
-      {clubLinkReady && (
-        <Link to="/clubHome" className="link-button">
-          Continue
-        </Link>
-      )}
 
       <div>
         <p></p>

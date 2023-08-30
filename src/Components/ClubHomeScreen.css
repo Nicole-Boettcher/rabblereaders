@@ -23,12 +23,12 @@
   }
 
   .tabs.selected {
-    background-color: brown; /* Change to your desired selected color */
+    background-color: #9b5a32fb; /* Change to your desired selected color */
     color: white;
   }
   
   .tabs:hover {
-    background-color: brown;
+    background-color: #9b5a32fb;
   }
 
 .bold {

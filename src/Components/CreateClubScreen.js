@@ -166,11 +166,11 @@ function CreateClubScreen(props) {
       </ul>
   
       <h3 className="title">Invited friends:</h3>
+
       <ul className="invited-list">
         {invitedFriends.map((user) => (
           <li className="invited-item" key={user.ItemID}>
             <span className="username">Username: {user.Username}</span>
-            <span className="user-id">ID: {user.ItemID}</span>
           </li>
         ))}
       </ul>
