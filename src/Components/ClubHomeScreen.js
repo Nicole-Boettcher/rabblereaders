@@ -162,7 +162,7 @@ function ClubHomeScreen(props) {
       if (id === undefined) {
         //need to get ID from local storage 
         console.log("grabbing id for history query from local storage")
-        const data = window.localStorage.getItem('HISTORY_ID')
+        const data = window.localStorage.getItem('CLUB_ID')
         id = JSON.parse(data)
       }
 
@@ -327,6 +327,7 @@ function ClubHomeScreen(props) {
   }
 
   const updateTabSelect = (tab) => {
+    console.log("history data: ", historyData.ItemID)
     setTabSelect(tab);
   }
 
@@ -536,16 +537,28 @@ function ClubHomeScreen(props) {
       >
         <h1 style={{ margin: "0" }}>{clubData.Username}</h1>
         <ul className="tabs-container">
-          <li className="tabs" onClick={() => updateTabSelect(1)}>
+          <li
+            className={`tabs ${tabSelect === 1 ? "selected" : ""}`}
+            onClick={() => updateTabSelect(1)}
+          >
             Home
           </li>
-          <li className="tabs" onClick={() => updateTabSelect(2)}>
+          <li
+            className={`tabs ${tabSelect === 2 ? "selected" : ""}`}
+            onClick={() => updateTabSelect(2)}
+          >
             Admin Duties
           </li>
-          <li className="tabs" onClick={() => updateTabSelect(3)}>
+          <li
+            className={`tabs ${tabSelect === 3 ? "selected" : ""}`}
+            onClick={() => updateTabSelect(3)}
+          >
             History
           </li>
-          <li className="tabs" onClick={() => updateTabSelect(4)}>
+          <li
+            className={`tabs ${tabSelect === 4 ? "selected" : ""}`}
+            onClick={() => updateTabSelect(4)}
+          >
             Members
           </li>
         </ul>
@@ -567,7 +580,7 @@ function ClubHomeScreen(props) {
               ))}
             </select>
             {selectedValue && (
-              <button onClick={() => selectAdmin(selectedValue)}>
+              <button className="button" onClick={() => selectAdmin(selectedValue)}>
                 Confirm {selectedValue.Username} as Admin
               </button>
             )}
@@ -628,8 +641,9 @@ function ClubHomeScreen(props) {
               {bookCycleData.MeetingStatus === "Review" && (
                 <div>
                   <p>
-                    Please use the chat below to discuss any meeting conflicts or confirm your availability. Once group comes to a concenus, the
-                    admin will soildify details
+                    Please use the chat below to discuss any meeting conflicts
+                    or confirm your availability. Once group comes to a
+                    concenus, the admin will soildify details
                   </p>
                 </div>
               )}
@@ -650,12 +664,17 @@ function ClubHomeScreen(props) {
 
               {/* Admin needs to confirm meeting details */}
 
-              {clubData.CurrentAdmin && bookCycleData.MeetingStatus && parseInt(clubData.CurrentAdmin.ItemID) ===
-                parseInt(JSON.parse(window.localStorage.getItem("USER_ID"))) &&
+              {clubData.CurrentAdmin &&
+                bookCycleData.MeetingStatus &&
+                parseInt(clubData.CurrentAdmin.ItemID) ===
+                  parseInt(
+                    JSON.parse(window.localStorage.getItem("USER_ID"))
+                  ) &&
                 bookCycleData.MeetingStatus === "Review" && (
                   <p>
                     {clubData.CurrentAdmin.Username} - Once the group has
-                    decided on meeting details, please confirm in the 'Admin Duties' tab
+                    decided on meeting details, please confirm in the 'Admin
+                    Duties' tab
                   </p>
                 )}
 
@@ -663,19 +682,30 @@ function ClubHomeScreen(props) {
                 <div className="container">
                   <h3>Discussion Points</h3>
                   <p>{bookCycleData.DiscussionPoints}</p>
-
-                  <button onClick={bookCycleReset}>
-                    Admin! Click here once meeting has been held. Ready for a new book!
-                  </button>
-                  {bookCycleResetConfirmVar && (
-                    <div>
-                      <button onClick={bookCycleResetConfirm}>
-                        Confirm -- all above details will vanish
-                      </button>
-                    </div>
-                  )}
                 </div>
               )}
+
+              {clubData.CurrentAdmin &&
+                bookCycleData.MeetingStatus &&
+                parseInt(clubData.CurrentAdmin.ItemID) ===
+                  parseInt(
+                    JSON.parse(window.localStorage.getItem("USER_ID"))
+                  ) &&
+                bookCycleData.MeetingStatus === "Confirmed" && (
+                  <div>
+                    <button className="button" onClick={bookCycleReset}>
+                      Admin! Click here once meeting has been held. Ready for a
+                      new book!
+                    </button>
+                    {bookCycleResetConfirmVar && (
+                      <div>
+                        <button className="button" onClick={bookCycleResetConfirm}>
+                          Click here to confirm -- all above details will vanish
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
             </div>
           )}
         </div>
@@ -751,12 +781,13 @@ function ClubHomeScreen(props) {
                     </p>
                     <div className="center-container">
                       <div className="calendar-container">
-                        <Calendar onChange={setMeetingDate} value={meetingDate} />
+                        <Calendar
+                          onChange={setMeetingDate}
+                          value={meetingDate}
+                        />
                       </div>
                     </div>
-                    <p className="text-center">
-                      {meetingDate.toDateString()}
-                    </p>
+                    <p className="text-center">{meetingDate.toDateString()}</p>
 
                     <label htmlFor="meetingTime-field">
                       Meeting time - include AM vs PM:{" "}
@@ -770,7 +801,7 @@ function ClubHomeScreen(props) {
                     />
                   </div>
 
-                  <button onClick={createBookDetails}>
+                  <button className="button" onClick={createBookDetails}>
                     Send suggested meeting details to group!
                   </button>
                 </div>
@@ -798,7 +829,8 @@ function ClubHomeScreen(props) {
           </div>
         )}
 
-        {clubData.CurrentAdmin && clubData.CurrentAdmin.ItemID ===
+        {clubData.CurrentAdmin &&
+          clubData.CurrentAdmin.ItemID ===
             JSON.parse(window.localStorage.getItem("USER_ID")) &&
           bookCycleData &&
           bookCycleData.MeetingStatus === "Review" && (
@@ -823,9 +855,7 @@ function ClubHomeScreen(props) {
                   <Calendar onChange={setMeetingDate} value={meetingDate} />
                 </div>
               </div>
-              <p className="text-center">
-                {meetingDate.toDateString()}
-              </p>
+              <p className="text-center">{meetingDate.toDateString()}</p>
 
               <label htmlFor="meetingTime-field">
                 Meeting time - include AM vs PM:{" "}
@@ -838,13 +868,14 @@ function ClubHomeScreen(props) {
                 onChange={(e) => setMeetingTime(e.target.value)}
               />
 
-              <button onClick={confirmMeetingDetails}>
+              <button className="button" onClick={confirmMeetingDetails}>
                 Final Confirmation on Meeting Details!
               </button>
             </div>
           )}
 
-        {bookCycleData.MeetingStatus === "Confirmed" && clubData.CurrentAdmin &&
+        {bookCycleData.MeetingStatus === "Confirmed" &&
+          clubData.CurrentAdmin &&
           clubData.CurrentAdmin.ItemID ===
             JSON.parse(window.localStorage.getItem("USER_ID")) &&
           !bookCycleData.DiscussionPoints && (
@@ -862,7 +893,7 @@ function ClubHomeScreen(props) {
                 value={discussionPoints}
                 onChange={(e) => setDiscussionPoints(e.target.value)}
               />
-              <button onClick={sendDiscussionPoints}>Send to Group</button>
+              <button className="button" onClick={sendDiscussionPoints}>Send to Group</button>
             </div>
           )}
       </div>
@@ -888,7 +919,9 @@ function ClubHomeScreen(props) {
                     <td>{book.BookDetails.bookAuthor}</td>
                     <td>{book.BookDetails.bookGenre}</td>
                     <td>{book.Admin.name}</td>
-                    <td>{new Date(book.MeetingDetails.meetingDate).toDateString()}</td>
+                    <td>
+                      {new Date(book.MeetingDetails.meetingDate).toDateString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -898,7 +931,7 @@ function ClubHomeScreen(props) {
       </div>
 
       <div className={tabSelect === 4 ? "show-content" : "content"}>
-        <p>Members:</p>
+        <h3>Members</h3>
         {membersData.length > 0 && (
           <ul>
             {membersData.map((contact) => (

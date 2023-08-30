@@ -22,3 +22,16 @@
     float: left;
   }
   
+  .button {
+    background-color: #9b5a32fb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .button:hover {
+    background-color: #9b5a329d;
+  }

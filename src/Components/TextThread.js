@@ -92,12 +92,15 @@ function TextThread(props) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-
-        <button onClick={refreshChat}>Refresh Chat to Send</button>
+        {!ableToSend && (
+          <div>
+            <button className="button" onClick={refreshChat}>Refresh Chat to Send</button>
+          </div>
+        )}
 
         {ableToSend && (
           <div>
-            <button onClick={sendMessage}>Send</button>
+            <button className="button" onClick={sendMessage}>Send</button>
           </div>
         )}
       </div>
