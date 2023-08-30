@@ -872,7 +872,7 @@ function ClubHomeScreen(props) {
       </div>
 
       <div className={tabSelect === 3 ? "show-content" : "content"}>
-        <p>History</p>
+        <h3>History</h3>
         {historyData.BookLog && (
           <div>
             <table className="styled-table">
@@ -902,7 +902,7 @@ function ClubHomeScreen(props) {
       </div>
 
       <div className={tabSelect === 4 ? "show-content" : "content"}>
-        <p>Order of Admins:</p>
+        <p>Members:</p>
         {membersData.length > 0 && (
           <ul>
             {membersData.map((contact) => (
